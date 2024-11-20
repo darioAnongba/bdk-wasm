@@ -4,41 +4,48 @@ use bdk_esplora::{
     esplora_client::{AsyncClient, Builder},
     EsploraAsyncExt,
 };
-use bdk_wallet::Wallet;
+use bdk_wallet::{PersistedWallet, Wallet};
 use bitcoin::BlockHash;
 use js_sys::Date;
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
+use crate::bitcoin::storage::SnapWalletPersister;
 use crate::types::{AddressInfo, BrowserSleeper, KeychainKind, Network};
 
+const STORAGE_KEY: &str = "bitcoin_wallet";
+
 #[wasm_bindgen]
-pub struct BitcoinEsploraWallet {
-    wallet: Rc<RefCell<Wallet>>,
+pub struct BitcoinEsploraWalletPersist {
+    wallet: Rc<RefCell<PersistedWallet<SnapWalletPersister>>>,
     client: Rc<RefCell<AsyncClient<BrowserSleeper>>>,
+    persister: SnapWalletPersister,
 }
 
 #[wasm_bindgen]
-impl BitcoinEsploraWallet {
-    #[wasm_bindgen(constructor)]
-    pub fn new(
+impl BitcoinEsploraWalletPersist {
+    pub async fn new(
         network: Network,
         external_descriptor: String,
         internal_descriptor: String,
         url: String,
-    ) -> Result<BitcoinEsploraWallet, String> {
+    ) -> Result<BitcoinEsploraWalletPersist, String> {
+        let mut persister = SnapWalletPersister::new(STORAGE_KEY.to_string());
+
         let wallet = Wallet::create(external_descriptor.clone(), internal_descriptor.clone())
             .network(network.into())
-            .create_wallet_no_persist()
+            .create_wallet_async(&mut persister)
+            .await
             .map_err(|e| format!("{:?}", e))?;
 
         let client = Builder::new(&url)
             .build_async_with_sleeper::<BrowserSleeper>()
             .map_err(|e| format!("{:?}", e))?;
 
-        Ok(BitcoinEsploraWallet {
+        Ok(BitcoinEsploraWalletPersist {
             wallet: Rc::new(RefCell::new(wallet)),
             client: Rc::new(RefCell::new(client)),
+            persister,
         })
     }
 
@@ -97,11 +104,19 @@ impl BitcoinEsploraWallet {
             .into()
     }
 
-    pub fn reveal_next_address(&self, keychain: KeychainKind) -> AddressInfo {
-        self.wallet
-            .borrow_mut()
-            .reveal_next_address(keychain.into())
-            .into()
+    pub async fn reveal_next_address(
+        &mut self,
+        keychain: KeychainKind,
+    ) -> Result<AddressInfo, JsValue> {
+        let mut wallet = self.wallet.borrow_mut();
+
+        let address = wallet.reveal_next_address(keychain.into());
+        wallet
+            .persist_async(&mut self.persister)
+            .await
+            .map_err(|e| JsValue::from_str(&format!("persist_async failed: {:?}", e)))?;
+
+        Ok(address.into())
     }
 
     pub fn list_unused_addresses(&self, keychain: KeychainKind) -> Vec<AddressInfo> {

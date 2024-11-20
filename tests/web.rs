@@ -17,7 +17,7 @@ use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-const STOP_GAP: usize = 5;
+const STOP_GAP: usize = 100;
 const PARALLEL_REQUESTS: usize = 5;
 const NETWORK: Network = Network::Testnet;
 
@@ -73,7 +73,7 @@ async fn test_esplora_wallet() {
     assert_eq!(address1.keychain(), KeychainKind::External);
     assert_eq!(address1.index(), 0);
 
-    let address2: bdk_wasm::types::AddressInfo = wallet.reveal_next_address(KeychainKind::External);
+    let address2 = wallet.reveal_next_address(KeychainKind::External);
     assert_eq!(address2.index(), 1);
 
     let address3 = wallet.next_unused_address(KeychainKind::External);

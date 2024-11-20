@@ -1,6 +1,6 @@
 use std::{future::Future, pin::Pin};
 
-use crate::{types::WalletError, SendSyncWrapper};
+use crate::{types::WalletError, utils::SendSyncWrapper};
 use bdk_wallet::{AsyncWalletPersister, ChangeSet};
 use js_sys::Promise;
 use serde_json::Value;
