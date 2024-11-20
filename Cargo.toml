@@ -17,20 +17,25 @@ js-sys = "0.3.72"
 web-sys = { version = "0.3.72", features = ["console"] }
 anyhow = "1.0.93"
 console_error_panic_hook = { version = "0.1.7", optional = true }
+thiserror = "2.0.3"
+serde_json = "1.0.133"
 
 # Compatibility to compile to WASM
 getrandom = { version = "0.2.15", features = ["js"] }
 ring = { version = "0.17.8", features = ["wasm32_unknown_unknown_js"] }
+gloo-timers = { version = "0.3.0", features = ["futures"] }
 
 # Bitcoin dependencies
-bdk_wallet = { version = "1.0.0-beta.5", features = ["keys-bip39"] }
-bdk_esplora = { version = "0.19.0", features = ["async-https"] }
+bdk_wallet = { git = "https://github.com/ValuedMammal/bdk", branch = "deps/esplora-client-103", features = [
+    "keys-bip39",
+] }
+bdk_esplora = { git = "https://github.com/ValuedMammal/bdk", branch = "deps/esplora-client-103", features = [
+    "async-https",
+] }
 serde-wasm-bindgen = "0.6.5"
 bitcoin = { version = "0.32.4", features = ["serde"], default-features = false }
 miniscript = "12.2.0"
 bdk_bitcoind_rpc = "0.16.0"
-thiserror = "2.0.3"
-serde_json = "1.0.133"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.45"

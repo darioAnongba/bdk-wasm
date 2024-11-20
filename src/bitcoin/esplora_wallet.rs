@@ -1,21 +1,37 @@
 use std::{cell::RefCell, rc::Rc, str::FromStr};
 
 use bdk_esplora::{
-    esplora_client::{AsyncClient, Builder},
+    esplora_client::{AsyncClient, Builder, Sleeper},
     EsploraAsyncExt,
 };
 use bdk_wallet::Wallet;
 use bitcoin::BlockHash;
+use gloo_timers::future::{sleep, TimeoutFuture};
 use js_sys::Date;
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
-use crate::types::{AddressInfo, KeychainKind, Network};
+use crate::{
+    types::{AddressInfo, KeychainKind, Network},
+    SendSyncWrapper,
+};
+
+#[derive(Clone)]
+
+struct GlooTimersSleeper;
+
+impl Sleeper for GlooTimersSleeper {
+    type Sleep = SendSyncWrapper<TimeoutFuture>;
+
+    fn sleep(dur: std::time::Duration) -> Self::Sleep {
+        SendSyncWrapper(sleep(dur))
+    }
+}
 
 #[wasm_bindgen]
 pub struct BitcoinEsploraWallet {
     wallet: Rc<RefCell<Wallet>>,
-    client: Rc<RefCell<AsyncClient>>,
+    client: Rc<RefCell<AsyncClient<GlooTimersSleeper>>>,
 }
 
 #[wasm_bindgen]
@@ -33,7 +49,7 @@ impl BitcoinEsploraWallet {
             .map_err(|e| format!("{:?}", e))?;
 
         let client = Builder::new(&url)
-            .build_async()
+            .build_async_with_sleeper::<GlooTimersSleeper>()
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(BitcoinEsploraWallet {
@@ -54,7 +70,7 @@ impl BitcoinEsploraWallet {
         let now = (Date::now() / 1000.0) as u64;
         self.wallet
             .borrow_mut()
-            .apply_update_at(update, Some(now))
+            .apply_update_at(update, now)
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(())
@@ -72,7 +88,7 @@ impl BitcoinEsploraWallet {
         let now = (Date::now() / 1000.0) as u64;
         self.wallet
             .borrow_mut()
-            .apply_update_at(update, Some(now))
+            .apply_update_at(update, now)
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(())

@@ -1,6 +1,6 @@
 use std::{future::Future, pin::Pin};
 
-use crate::{types::WalletError, SendFuture};
+use crate::{types::WalletError, SendSyncWrapper};
 use bdk_wallet::{AsyncWalletPersister, ChangeSet};
 use js_sys::Promise;
 use serde_json::Value;
@@ -79,7 +79,7 @@ impl AsyncWalletPersister for SnapWalletPersister {
         Self: 'a,
     {
         let fut = async move { persister.read_changeset().await };
-        let send_fut = SendFuture(fut);
+        let send_fut = SendSyncWrapper(fut);
         Box::pin(send_fut)
     }
 
@@ -91,7 +91,7 @@ impl AsyncWalletPersister for SnapWalletPersister {
         Self: 'a,
     {
         let fut = async move { persister.write_changeset(changeset).await };
-        let send_fut = SendFuture(fut);
+        let send_fut = SendSyncWrapper(fut);
         Box::pin(send_fut)
     }
 }
