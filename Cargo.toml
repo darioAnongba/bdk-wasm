@@ -1,24 +1,37 @@
 [package]
-name = "bdk-wasm"
+name = "bdk_wasm"
 version = "0.1.0"
-authors = ["Dario Anongba Varela <dario.anongba@gmail.com>"]
+repository = "https://github.com/MetaMask/bdk-wasm"
+description = "A modern, lightweight, descriptor-based wallet library for WASM and JS/TS"
+keywords = [
+    "bitcoin",
+    "wallet",
+    "descriptor",
+    "psbt",
+    "wasm",
+    "js",
+    "typescript",
+]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+authors = ["Bitcoin Developers"]
 edition = "2021"
+rust-version = "1.63"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["esplora"]
+default = []
 esplora = ["bdk_esplora"]
 debug = ["console_error_panic_hook"]
-metamask = []
+snap = ["esplora"]
 bitcoind = ["bdk_bitcoind_rpc"]
 
 [dependencies]
 wasm-bindgen = "0.2.95"
 wasm-bindgen-futures = "0.4.45"
 anyhow = "1.0.93"
-console_error_panic_hook = { version = "0.1.7", optional = true }
 thiserror = "2.0.3"
 serde = { version = "1.0.215", default-features = false, features = ["derive"] }
 js-sys = "0.3.72"
@@ -30,9 +43,7 @@ getrandom = { version = "0.2.15", features = ["js"] }
 ring = { version = "0.17.8", features = ["wasm32_unknown_unknown_js"] }
 
 # Bitcoin dependencies
-bdk_wallet = { git = "https://github.com/bitcoindevkit/bdk", branch = "master", features = [
-    "keys-bip39",
-] }
+bdk_wallet = { git = "https://github.com/bitcoindevkit/bdk", branch = "master" }
 bdk_esplora = { git = "https://github.com/bitcoindevkit/bdk", branch = "master", default-features = false, features = [
     "async-https",
 ], optional = true }
@@ -40,9 +51,15 @@ bitcoin = { version = "0.32.4", default-features = false }
 miniscript = "12.2.0"
 bdk_bitcoind_rpc = { version = "0.16.0", optional = true }
 
+# Debug dependencies
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
 [dev-dependencies]
 wasm-bindgen-test = "0.3.45"
 web-sys = { version = "0.3.72", features = ["console"] }
+bdk_wallet = { git = "https://github.com/bitcoindevkit/bdk", branch = "master", features = [
+    "keys-bip39",
+] }
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.

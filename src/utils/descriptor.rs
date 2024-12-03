@@ -10,19 +10,14 @@ use wasm_bindgen::prelude::{wasm_bindgen, JsError, JsValue};
 use super::result::JsResult;
 
 #[wasm_bindgen]
-pub fn mnemonic_to_descriptor(
-    mnemonic: &str,
-    passphrase: &str,
+pub fn seed_to_descriptor(
+    seed: &[u8],
     network: Network,
     address_type: AddressType,
 ) -> JsResult<DescriptorPair> {
-    let (external, internal) = crate::bitcoin::mnemonic_to_descriptor(
-        mnemonic,
-        passphrase,
-        network.into(),
-        address_type.into(),
-    )
-    .map_err(|e| JsError::new(&e.to_string()))?;
+    let (external, internal) =
+        crate::bitcoin::seed_to_descriptor(seed, network.into(), address_type.into())
+            .map_err(|e| JsError::new(&e.to_string()))?;
 
     Ok(DescriptorPair::new(
         external.0.to_string_with_secret(&external.1),
@@ -71,8 +66,8 @@ pub fn xpub_to_descriptor(
 }
 
 #[wasm_bindgen]
-pub fn mnemonic_to_xpriv(mnemonic: &str, passphrase: &str, network: Network) -> JsResult<String> {
-    let xprv = crate::bitcoin::mnemonic_to_xpriv(mnemonic, passphrase, network.into())
+pub fn seed_to_xpriv(seed: &[u8], network: Network) -> JsResult<String> {
+    let xprv = crate::bitcoin::seed_to_xpriv(seed, network.into())
         .map_err(|e| JsError::new(&e.to_string()))?;
 
     Ok(xprv.to_string())

@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Error};
 use bdk_wallet::{
-    bip39::Mnemonic,
     keys::{DerivableKey, ExtendedKey},
     template::{
         Bip44, Bip44Public, Bip49, Bip49Public, Bip84, Bip84Public, Bip86, Bip86Public,
@@ -17,13 +16,12 @@ use bitcoin::{
 
 use crate::types::SLIP10Node;
 
-pub fn mnemonic_to_descriptor(
-    mnemonic: &str,
-    passphrase: &str,
+pub fn seed_to_descriptor(
+    seed: &[u8],
     network: Network,
     address_type: AddressType,
 ) -> Result<(DescriptorTemplateOut, DescriptorTemplateOut), Error> {
-    let xprv = mnemonic_to_xpriv(mnemonic, passphrase, network)?;
+    let xprv = seed_to_xpriv(seed, network)?;
 
     match address_type {
         AddressType::P2pkh => build_xpriv_descriptor(Bip44, xprv, network),
@@ -105,14 +103,8 @@ pub fn slip10_to_extended(
     }
 }
 
-pub fn mnemonic_to_xpriv(
-    mnemonic: &str,
-    passphrase: &str,
-    network: Network,
-) -> Result<Xpriv, Error> {
-    let mnemonic = Mnemonic::parse(mnemonic)?;
-    let xprv = Xpriv::new_master(network, &mnemonic.to_seed(passphrase))?;
-
+pub fn seed_to_xpriv(seed: &[u8], network: Network) -> Result<Xpriv, Error> {
+    let xprv = Xpriv::new_master(network, seed)?;
     Ok(xprv)
 }
 

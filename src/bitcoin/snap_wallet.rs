@@ -11,7 +11,7 @@ use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 
 use crate::{
-    bitcoin::{mnemonic_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
+    bitcoin::{seed_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
     result::JsResult,
     storage::SnapPersister,
     types::{AddressInfo, AddressType, Balance, KeychainKind, Network},
@@ -20,20 +20,20 @@ use crate::{
 const STORAGE_KEY: &str = "wallet";
 
 #[wasm_bindgen]
-pub struct MetaMaskWallet {
+pub struct SnapWallet {
     wallet: PersistedWallet<SnapPersister>,
     client: AsyncClient,
     persister: SnapPersister,
 }
 
 #[wasm_bindgen]
-impl MetaMaskWallet {
+impl SnapWallet {
     async fn create<D>(
         network: Network,
         external_descriptor: D,
         internal_descriptor: D,
         url: &str,
-    ) -> JsResult<MetaMaskWallet>
+    ) -> JsResult<SnapWallet>
     where
         D: IntoWalletDescriptor + Send + Clone + 'static,
     {
@@ -45,7 +45,7 @@ impl MetaMaskWallet {
 
         let client = Builder::new(&url).build_async()?;
 
-        Ok(MetaMaskWallet {
+        Ok(SnapWallet {
             wallet,
             client,
             persister,
@@ -57,19 +57,18 @@ impl MetaMaskWallet {
         external_descriptor: String,
         internal_descriptor: String,
         url: &str,
-    ) -> JsResult<MetaMaskWallet> {
+    ) -> JsResult<SnapWallet> {
         Self::create(network, external_descriptor, internal_descriptor, url).await
     }
 
-    pub async fn from_mnemonic(
-        mnemonic: &str,
-        passphrase: &str,
+    pub async fn from_seed(
+        seed: &[u8],
         network: Network,
         address_type: AddressType,
         url: &str,
-    ) -> JsResult<MetaMaskWallet> {
+    ) -> JsResult<SnapWallet> {
         let (external_descriptor, internal_descriptor) =
-            mnemonic_to_descriptor(&mnemonic, &passphrase, network.into(), address_type.into())
+            seed_to_descriptor(seed, network.into(), address_type.into())
                 .map_err(|e| JsError::new(&e.to_string()))?;
 
         Self::create(network, external_descriptor, internal_descriptor, url).await
@@ -81,7 +80,7 @@ impl MetaMaskWallet {
         network: Network,
         address_type: AddressType,
         url: &str,
-    ) -> JsResult<MetaMaskWallet> {
+    ) -> JsResult<SnapWallet> {
         let xprv = Xpriv::from_str(extended_privkey).map_err(|e| JsError::new(&e.to_string()))?;
         let fingerprint = Fingerprint::from_hex(fingerprint)?;
 
@@ -98,7 +97,7 @@ impl MetaMaskWallet {
         network: Network,
         address_type: AddressType,
         url: &str,
-    ) -> JsResult<MetaMaskWallet> {
+    ) -> JsResult<SnapWallet> {
         let xpub = Xpub::from_str(extended_pubkey)?;
         let fingerprint = Fingerprint::from_hex(fingerprint)?;
 
@@ -109,7 +108,7 @@ impl MetaMaskWallet {
         Self::create(network, external_descriptor, internal_descriptor, url).await
     }
 
-    pub async fn load(url: &str) -> JsResult<MetaMaskWallet> {
+    pub async fn load(url: &str) -> JsResult<SnapWallet> {
         let mut persister = SnapPersister::new(STORAGE_KEY);
         let wallet_opt = BdkWallet::load().load_wallet_async(&mut persister).await?;
 
@@ -120,7 +119,7 @@ impl MetaMaskWallet {
 
         let client = Builder::new(&url).build_async()?;
 
-        Ok(MetaMaskWallet {
+        Ok(SnapWallet {
             wallet,
             client,
             persister,

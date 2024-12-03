@@ -4,25 +4,28 @@
 
 extern crate wasm_bindgen_test;
 
+use bdk_wallet::{bip39::Mnemonic, ChangeSet};
 use bdk_wasm::{
-    bitcoin::EsploraWallet,
-    mnemonic_to_descriptor, mnemonic_to_xpriv, set_panic_hook,
+    bitcoin::Wallet,
+    seed_to_descriptor, seed_to_xpriv, set_panic_hook,
     types::{AddressType, KeychainKind, Network},
     xpriv_to_descriptor, xpub_to_descriptor,
 };
+use serde_wasm_bindgen::from_value;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-const STOP_GAP: usize = 5;
-const PARALLEL_REQUESTS: usize = 1;
 const NETWORK: Network = Network::Testnet;
 const ADDRESS_TYPE: AddressType = AddressType::P2wpkh;
 const MNEMONIC: &str = "journey embrace permit coil indoor stereo welcome maid movie easy clock spider tent slush bright luxury awake waste legal modify awkward answer acid goose";
 
 #[wasm_bindgen_test]
-async fn test_mnemonic_to_xpriv() {
-    let xprv = mnemonic_to_xpriv(MNEMONIC, "", NETWORK).expect("xpub_to_descriptor");
+async fn test_seed_to_xpriv() {
+    set_panic_hook();
+
+    let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
+    let xprv = seed_to_xpriv(&seed, NETWORK).expect("seed_to_xpriv");
 
     assert_eq!(
         xprv,
@@ -31,11 +34,11 @@ async fn test_mnemonic_to_xpriv() {
 }
 
 #[wasm_bindgen_test]
-async fn test_mnemonic_to_descriptor() {
+async fn test_seed_to_descriptor() {
     set_panic_hook();
 
-    let descriptors = mnemonic_to_descriptor(MNEMONIC, "", NETWORK, ADDRESS_TYPE)
-        .expect("mnemonic_to_descriptor");
+    let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
+    let descriptors = seed_to_descriptor(&seed, NETWORK, ADDRESS_TYPE).expect("seed_to_descriptor");
 
     assert_eq!(
         descriptors.external(),
@@ -86,53 +89,32 @@ async fn test_xpub_to_descriptor() {
 }
 
 #[wasm_bindgen_test]
-async fn test_esplora_wallet() {
+async fn test_wallet() {
     set_panic_hook();
 
-    let esplora_url = match NETWORK {
-        Network::Bitcoin => "https://blockstream.info/api",
-        Network::Testnet => "https://blockstream.info/testnet/api",
-        Network::Testnet4 => "https://blockstream.info/testnet/api",
-        Network::Signet => "https://mutinynet.com/api",
-        Network::Regtest => "https://localhost:3000",
-    };
-
-    let mut wallet = EsploraWallet::from_mnemonic(MNEMONIC, "", NETWORK, ADDRESS_TYPE, esplora_url)
-        .expect("esplora_wallet");
-
-    wallet
-        .full_scan(STOP_GAP, PARALLEL_REQUESTS)
-        .await
-        .expect("full_scan");
-
-    let address0 = wallet.peek_address(KeychainKind::External, 0);
-    assert_eq!(
-        address0.address(),
-        "tb1qjtgffm20l9vu6a7gacxvpu2ej4kdcsgc26xfdz".to_string()
-    );
+    let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
+    let mut wallet = Wallet::from_seed(&seed, NETWORK, ADDRESS_TYPE).expect("wallet");
 
     let balance = wallet.balance();
     assert_eq!(balance.total(), 0);
 
-    let address1 = wallet.next_unused_address(KeychainKind::External);
-    assert_eq!(address1.keychain(), KeychainKind::External);
-    assert_eq!(address1.index(), 0);
+    let initial_changeset_js = wallet.take_staged().expect("take_staged");
+    let initial_changeset: ChangeSet =
+        from_value(initial_changeset_js.clone()).expect("from_value");
+    assert_eq!(initial_changeset.descriptor.unwrap().to_string(), "wpkh([27f9035f/84'/1'/0']tpubDCkv2fHDfPg5hB6bFqJ4fNiins2Z8r5vKtD4xq5irCG2HsUXkgHYsj3gfGTdvAv41hoJeXjfxu7EBQqZMm6SVkxztKFtaaE7HuLdkuL7KNq/0/*)#wle7e0wp");
+    assert_eq!(
+        initial_changeset.change_descriptor.unwrap().to_string(),
+        "wpkh([27f9035f/84'/1'/0']tpubDCkv2fHDfPg5hB6bFqJ4fNiins2Z8r5vKtD4xq5irCG2HsUXkgHYsj3gfGTdvAv41hoJeXjfxu7EBQqZMm6SVkxztKFtaaE7HuLdkuL7KNq/1/*)#ltuly67e"
+    );
 
-    let address2: bdk_wasm::types::AddressInfo = wallet.reveal_next_address(KeychainKind::External);
-    assert_eq!(address2.index(), 1);
+    let address0 = wallet.reveal_next_address(KeychainKind::External);
+    assert_eq!(address0.index(), 0);
 
-    let address3 = wallet.next_unused_address(KeychainKind::External);
-    assert_eq!(address3.index(), 0);
+    let address1 = wallet.reveal_next_address(KeychainKind::External);
+    assert_eq!(address1.index(), 1);
 
-    // Should do a single call to the server (for each keychain)
-    wallet.sync(1).await.expect("sync");
-
-    // Should do a stop_gap calls to the server (for each keychain) and not start from beginning
-    wallet
-        .full_scan(STOP_GAP, PARALLEL_REQUESTS)
-        .await
-        .expect("second full_scan");
-
-    let unused_addresses = wallet.list_unused_addresses(KeychainKind::External);
-    assert_eq!(unused_addresses.len(), 2);
+    let final_changeset_js = wallet
+        .take_merged(initial_changeset_js)
+        .expect("take_merged");
+    assert!(!final_changeset_js.is_null() && !final_changeset_js.is_undefined());
 }

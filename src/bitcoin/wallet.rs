@@ -6,7 +6,7 @@ use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 
 use crate::{
-    bitcoin::{mnemonic_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
+    bitcoin::{seed_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
     result::JsResult,
     types::{AddressInfo, AddressType, Balance, KeychainKind, Network},
 };
@@ -42,14 +42,9 @@ impl Wallet {
             .map_err(|e| JsError::new(&e.to_string()))
     }
 
-    pub fn from_mnemonic(
-        mnemonic: &str,
-        passphrase: &str,
-        network: Network,
-        address_type: AddressType,
-    ) -> JsResult<Wallet> {
+    pub fn from_seed(seed: &[u8], network: Network, address_type: AddressType) -> JsResult<Wallet> {
         let (external_descriptor, internal_descriptor) =
-            mnemonic_to_descriptor(&mnemonic, &passphrase, network.into(), address_type.into())
+            seed_to_descriptor(seed, network.into(), address_type.into())
                 .map_err(|e| JsError::new(&e.to_string()))?;
 
         Self::create(network, external_descriptor, internal_descriptor)

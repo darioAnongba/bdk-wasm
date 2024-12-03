@@ -4,11 +4,12 @@
 
 extern crate wasm_bindgen_test;
 
+use bdk_wallet::bip39::Mnemonic;
 use web_sys::console;
 
 use bdk_wasm::{
     bitcoin::RpcWallet,
-    mnemonic_to_descriptor, set_panic_hook,
+    seed_to_descriptor, set_panic_hook,
     types::{AddressType, Network},
 };
 use wasm_bindgen_test::*;
@@ -22,8 +23,8 @@ const MNEMONIC: &str = "drip drum plug universe beyond gasp cram action hurt kee
 async fn test_rpc_wallet() {
     set_panic_hook();
 
-    let descriptors =
-        mnemonic_to_descriptor(MNEMONIC, "", NETWORK, AddressType::P2wpkh).expect("descriptor");
+    let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
+    let descriptors = seed_to_descriptor(&seed, NETWORK, AddressType::P2wpkh).expect("descriptor");
     let rpc_url = "http://127.0.0.1:18443";
 
     let wallet = RpcWallet::new(

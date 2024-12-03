@@ -1,5 +1,5 @@
-#[cfg(feature = "metamask")]
+#[cfg(feature = "snap")]
 mod snap_persister;
 
-#[cfg(feature = "metamask")]
+#[cfg(feature = "snap")]
 pub use snap_persister::SnapPersister;
