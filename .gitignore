@@ -1,9 +1,17 @@
 /target
 **/*.rs.bk
 Cargo.lock
+/.vscode
+.idea
+*.swp
+.cargo
+
 bin/
 pkg/
 wasm-pack.log
 tmp/
 
+.DS_Store
+
 .env
+.env.*.local
