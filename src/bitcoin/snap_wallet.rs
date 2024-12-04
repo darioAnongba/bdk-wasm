@@ -52,6 +52,24 @@ impl SnapWallet {
         })
     }
 
+    pub async fn load(url: &str) -> JsResult<SnapWallet> {
+        let mut persister = SnapPersister::new(STORAGE_KEY);
+        let wallet_opt = BdkWallet::load().load_wallet_async(&mut persister).await?;
+
+        let wallet = match wallet_opt {
+            Some(wallet) => wallet,
+            None => return Err(JsError::new("Failed to load wallet, check the changeset")),
+        };
+
+        let client = Builder::new(&url).build_async()?;
+
+        Ok(SnapWallet {
+            wallet,
+            client,
+            persister,
+        })
+    }
+
     pub async fn from_descriptors(
         network: Network,
         external_descriptor: String,
@@ -106,24 +124,6 @@ impl SnapWallet {
                 .map_err(|e| JsError::new(&e.to_string()))?;
 
         Self::create(network, external_descriptor, internal_descriptor, url).await
-    }
-
-    pub async fn load(url: &str) -> JsResult<SnapWallet> {
-        let mut persister = SnapPersister::new(STORAGE_KEY);
-        let wallet_opt = BdkWallet::load().load_wallet_async(&mut persister).await?;
-
-        let wallet = match wallet_opt {
-            Some(wallet) => wallet,
-            None => return Err(JsError::new("Failed to load wallet, check the changeset")),
-        };
-
-        let client = Builder::new(&url).build_async()?;
-
-        Ok(SnapWallet {
-            wallet,
-            client,
-            persister,
-        })
     }
 
     pub async fn full_scan(&mut self, stop_gap: usize, parallel_requests: usize) -> JsResult<()> {

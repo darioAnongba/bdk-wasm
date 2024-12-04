@@ -4,7 +4,7 @@
   <img src="./static/bdk.png" width="220" />
 
   <p>
-    <strong>The Bitcoin Dev Kit for Browsers and Node!</strong>
+    <strong>The Bitcoin Dev Kit for Browsers and Node</strong>
   </p>
 
   <p>
@@ -22,9 +22,22 @@
 ## About
 
 The `bdk-wasm` library aims at providing access to the excellent [BitcoinDevKit](https://github.com/bitcoindevkit/bdk) to JS and Node environments (and eventually any device supporting WebAssembly).
-It specializes in compiling BDK on the `wasm32-unknown-unknown` target and use [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) to create JS bindings.
+It specializes in compiling BDK on the `wasm32-unknown-unknown` target and use [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) to create TypeScript bindings.
 
-This repo also handles the packaging and publishing of the `bdk` NPM package, using `wasm-pack`.
+This repo handles the packaging and publishing of the `bdk` NPM package, using `wasm-pack`.
+
+This library offers all the desired functionality to build a Bitcoin wallet out of the box:
+
+- UTXO management
+- Coin selection
+- Wallet upates by syncing and scanning the chain data
+- Bitcoin descriptors for flexibility in the definition of spending conditions. Supports all address types from legacy to Taproot.
+- State update and persistence
+- Transaction creation, signing and broadcasting
+- Dynamic addresses
+- and much more
+
+For a lightweight library providing stateless utility functions, see [`bitcoinjs`](https://github.com/bitcoinjs/bitcoinjs-lib).
 
 ## Browser Usage
 
@@ -60,6 +73,8 @@ CC = "/opt/homebrew/opt/llvm/bin/clang"
 ```sh
 wasm-pack build
 ```
+
+> Choose your desired features when building: `wasm-pack build --features "esplora default snap bitcoind"`
 
 ### Test in Headless Browsers with `wasm-pack test`
 
