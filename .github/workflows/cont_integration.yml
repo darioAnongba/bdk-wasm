@@ -82,8 +82,5 @@ jobs:
           components: clippy
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.7.5
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: Clippy Results
-          args: --all-features --all-targets -- -D warnings
+      - name: Run Clippy
+        run: cargo clippy --all-features --all-targets -- -D warnings
