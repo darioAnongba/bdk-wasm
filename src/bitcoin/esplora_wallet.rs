@@ -124,7 +124,7 @@ impl EsploraWallet {
             .await?;
 
         let now = (Date::now() / 1000.0) as u64;
-        self.wallet.apply_update_at(update, now)?;
+        self.wallet.apply_update_at(update, Some(now))?;
 
         Ok(())
     }
@@ -134,7 +134,7 @@ impl EsploraWallet {
         let update = self.client.sync(request, parallel_requests).await?;
 
         let now = (Date::now() / 1000.0) as u64;
-        self.wallet.apply_update_at(update, now)?;
+        self.wallet.apply_update_at(update, Some(now))?;
 
         Ok(())
     }

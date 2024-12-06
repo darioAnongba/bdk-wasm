@@ -43,8 +43,8 @@ getrandom = { version = "0.2.15", features = ["js"] }
 ring = { version = "0.17.8", features = ["wasm32_unknown_unknown_js"] }
 
 # Bitcoin dependencies
-bdk_wallet = { git = "https://github.com/bitcoindevkit/bdk", branch = "master" }
-bdk_esplora = { git = "https://github.com/bitcoindevkit/bdk", branch = "master", default-features = false, features = [
+bdk_wallet = { version = "1.0.0-beta.5" }
+bdk_esplora = { version = "0.19", default-features = false, features = [
     "async-https",
 ], optional = true }
 bitcoin = { version = "0.32.4", default-features = false }
@@ -57,9 +57,7 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 [dev-dependencies]
 wasm-bindgen-test = "0.3.45"
 web-sys = { version = "0.3.72", features = ["console"] }
-bdk_wallet = { git = "https://github.com/bitcoindevkit/bdk", branch = "master", features = [
-    "keys-bip39",
-] }
+bdk_wallet = { version = "1.0.0-beta.5", features = ["keys-bip39"] }
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.
