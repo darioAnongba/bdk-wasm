@@ -30,11 +30,9 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ matrix.rust.version }}
-          override: true
-          profile: minimal
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -f
       - name: Rust Cache
@@ -64,11 +62,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
-          profile: minimal
           components: rustfmt
       - name: Check fmt
         run: cargo fmt --all -- --config format_code_in_doc_comments=true --check
@@ -80,11 +76,10 @@ jobs:
       checks: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ needs.prepare.outputs.rust_version }}
           components: clippy
-          override: true
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.7.5
       - uses: actions-rs/clippy-check@v1
