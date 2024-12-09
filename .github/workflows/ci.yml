@@ -21,7 +21,6 @@ jobs:
       matrix:
         rust:
           - version: stable
-            components: clippy
           - version: 1.63.0 # MSRV
         features:
           - all
