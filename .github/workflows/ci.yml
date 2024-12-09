@@ -6,17 +6,6 @@ on:
 name: CI
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    outputs:
-      rust_version: ${{ steps.read_toolchain.outputs.rust_version }}
-    steps:
-      - name: "Checkout repo"
-        uses: actions/checkout@v4
-      - name: "Read rust version"
-        id: read_toolchain
-        run: echo "rust_version=$(cat rust-version)" >> $GITHUB_OUTPUT
-
   build-test:
     name: Build and test
     runs-on: ubuntu-latest
