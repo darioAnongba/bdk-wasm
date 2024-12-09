@@ -5,7 +5,7 @@ Cargo.lock
 .idea
 *.swp
 .cargo
-.npmrc
+
 bin/
 pkg/
 wasm-pack.log
