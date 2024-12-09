@@ -4,7 +4,8 @@ Cargo.lock
 /.vscode
 .idea
 *.swp
-.cargo
+/.cargo
+.npmrc
 
 bin/
 pkg/

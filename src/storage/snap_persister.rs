@@ -34,7 +34,7 @@ impl SnapPersister {
         let mut changeset = self.extract_changeset(&state)?;
         changeset.merge(new_changeset.clone());
 
-        let state_bytes = rmp_serde::to_vec(&changeset).map_err(SnapPersisterError::EncodeMRP)?;
+        let state_bytes = rmp_serde::to_vec(&changeset).map_err(SnapPersisterError::EncodeMP)?;
         let state_b64 = BASE64_STANDARD.encode(&state_bytes);
         state.insert(self.key.clone(), state_b64);
 
@@ -80,7 +80,7 @@ impl SnapPersister {
             let state_bytes = BASE64_STANDARD
                 .decode(state_b64)
                 .map_err(SnapPersisterError::DecodeBase64)?;
-            rmp_serde::from_slice(&state_bytes).map_err(SnapPersisterError::DecodeMRP)
+            rmp_serde::from_slice(&state_bytes).map_err(SnapPersisterError::DecodeMP)
         } else {
             Ok(ChangeSet::default())
         }
