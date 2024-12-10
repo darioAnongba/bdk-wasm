@@ -13,7 +13,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.73.0 # MSRV
+          - 1.74.0 # MSRV
         features:
           - all
           - debug,default
