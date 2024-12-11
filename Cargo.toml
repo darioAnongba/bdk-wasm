@@ -33,9 +33,9 @@ wasm-bindgen-futures = "0.4.45"
 anyhow = "1.0.93"
 thiserror = "2.0.3"
 serde = { version = "1.0.215", default-features = false, features = ["derive"] }
+js-sys = "0.3.76"
 serde-wasm-bindgen = "0.6.5"
 rmp-serde = "1.3.0"
-js-sys = "0.3.76"
 
 # Compatibility to compile to WASM
 getrandom = { version = "0.2.15", features = ["js"] }
