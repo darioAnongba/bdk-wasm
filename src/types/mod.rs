@@ -1,5 +1,8 @@
 mod address;
+mod amount;
 mod balance;
+mod block;
+mod checkpoint;
 mod descriptor;
 mod error;
 mod keychain;
@@ -7,7 +10,10 @@ mod network;
 mod slip_10;
 
 pub use address::*;
+pub use amount::*;
 pub use balance::*;
+pub use block::*;
+pub use checkpoint::*;
 pub use descriptor::*;
 pub use error::*;
 pub use keychain::*;

@@ -27,8 +27,14 @@ jobs:
         uses: dtolnay/rust-toolchain@4f647fc679bcd3b11499ccb42104547c83dabe96
         with:
           toolchain: ${{ matrix.rust }}
+      - name: Download wasm-pack
+        run: curl -sSL https://rustwasm.github.io/wasm-pack/installer/init.sh -o wasm-pack-init.sh
+      - name: Verify wasm-pack checksum
+        run: |
+          echo "7969444a2635a28157a31fae9736701f658a5ab346eb0c99bea18313c0d84018 wasm-pack-init.sh" > checksum.txt
+          sha256sum -c checksum.txt
       - name: Install wasm-pack
-        run: cargo install wasm-pack --locked
+        run: sh wasm-pack-init.sh -f
       - name: Rust Cache
         uses: Swatinem/rust-cache@82a92a6e8fbeee089604da2575dc567ae9ddeaab
       - name: Build

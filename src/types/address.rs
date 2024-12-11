@@ -59,7 +59,7 @@ impl From<BdkAddressInfo> for AddressInfo {
 
 /// The different types of addresses.
 #[wasm_bindgen]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug)]
 #[non_exhaustive]
 pub enum AddressType {
     /// Pay to pubkey hash.

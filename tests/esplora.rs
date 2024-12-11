@@ -48,7 +48,7 @@ async fn test_esplora_wallet() {
     );
 
     let balance = wallet.balance();
-    assert_eq!(balance.total(), 0);
+    assert_eq!(balance.total().to_sat(), 0);
 
     let address1 = wallet.next_unused_address(KeychainKind::External);
     assert_eq!(address1.keychain(), KeychainKind::External);

@@ -13,7 +13,7 @@ use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 use crate::{
     bitcoin::{seed_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
     result::JsResult,
-    types::{AddressInfo, AddressType, Balance, KeychainKind, Network},
+    types::{AddressInfo, AddressType, Balance, CheckPoint, KeychainKind, Network},
 };
 
 #[wasm_bindgen]
@@ -185,6 +185,10 @@ impl EsploraWallet {
             .transactions()
             .map(|tx| to_value(&tx.tx_node.tx).map_err(Into::into))
             .collect()
+    }
+
+    pub fn latest_checkpoint(&self) -> CheckPoint {
+        self.wallet.latest_checkpoint().into()
     }
 
     pub fn take_staged(&mut self) -> JsResult<JsValue> {
