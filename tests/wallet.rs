@@ -96,6 +96,9 @@ async fn test_wallet() {
     let balance = wallet.balance();
     assert_eq!(balance.total().to_sat(), 0);
 
+    let block_height = wallet.latest_checkpoint().height();
+    assert_eq!(block_height, 0);
+
     let initial_changeset_js = wallet.take_staged().expect("take_staged");
     let initial_changeset: ChangeSet = from_value(initial_changeset_js.clone()).expect("from_value");
     assert_eq!(initial_changeset.descriptor.unwrap().to_string(), "wpkh([27f9035f/84'/1'/0']tpubDCkv2fHDfPg5hB6bFqJ4fNiins2Z8r5vKtD4xq5irCG2HsUXkgHYsj3gfGTdvAv41hoJeXjfxu7EBQqZMm6SVkxztKFtaaE7HuLdkuL7KNq/0/*)#wle7e0wp");
