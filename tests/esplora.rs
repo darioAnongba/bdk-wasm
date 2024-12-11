@@ -8,7 +8,7 @@ use bdk_wallet::bip39::Mnemonic;
 use bdk_wasm::{
     bitcoin::{EsploraClient, Wallet},
     set_panic_hook,
-    types::{AddressType, Network},
+    types::{AddressType, KeychainKind, Network},
 };
 use js_sys::Date;
 use wasm_bindgen_test::*;
@@ -17,7 +17,7 @@ wasm_bindgen_test_configure!(run_in_browser);
 
 const STOP_GAP: usize = 5;
 const PARALLEL_REQUESTS: usize = 1;
-const NETWORK: Network = Network::Signet;
+const NETWORK: Network = Network::Testnet;
 const ADDRESS_TYPE: AddressType = AddressType::P2wpkh;
 const MNEMONIC: &str = "journey embrace permit coil indoor stereo welcome maid movie easy clock spider tent slush bright luxury awake waste legal modify awkward answer acid goose";
 
@@ -51,6 +51,8 @@ async fn test_esplora_client() {
 
     let fullscan_block_height = wallet.latest_checkpoint().height();
     assert!(fullscan_block_height > 0);
+
+    wallet.reveal_addresses_to(KeychainKind::External, 5);
 
     let sync_request = wallet.start_sync_with_revealed_spks();
     let update = blockchain_client
