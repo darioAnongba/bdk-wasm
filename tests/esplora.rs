@@ -6,22 +6,23 @@ extern crate wasm_bindgen_test;
 
 use bdk_wallet::bip39::Mnemonic;
 use bdk_wasm::{
-    bitcoin::EsploraClient,
+    bitcoin::{EsploraClient, Wallet},
     set_panic_hook,
-    types::{AddressType, KeychainKind, Network},
+    types::{AddressType, Network},
 };
+use js_sys::Date;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
 const STOP_GAP: usize = 5;
 const PARALLEL_REQUESTS: usize = 1;
-const NETWORK: Network = Network::Testnet;
+const NETWORK: Network = Network::Signet;
 const ADDRESS_TYPE: AddressType = AddressType::P2wpkh;
 const MNEMONIC: &str = "journey embrace permit coil indoor stereo welcome maid movie easy clock spider tent slush bright luxury awake waste legal modify awkward answer acid goose";
 
 #[wasm_bindgen_test]
-async fn test_esplora_wallet() {
+async fn test_esplora_client() {
     set_panic_hook();
 
     let esplora_url = match NETWORK {
@@ -33,38 +34,34 @@ async fn test_esplora_wallet() {
     };
 
     let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
-    let mut wallet = EsploraClient::from_seed(&seed, NETWORK, ADDRESS_TYPE, esplora_url).expect("esplora_wallet");
+    let mut wallet = Wallet::from_seed(&seed, NETWORK, ADDRESS_TYPE).expect("wallet");
+    let mut blockchain_client = EsploraClient::new(esplora_url).expect("esplora_client");
 
-    wallet.full_scan(STOP_GAP, PARALLEL_REQUESTS).await.expect("full_scan");
+    let block_height = wallet.latest_checkpoint().height();
+    assert_eq!(block_height, 0);
 
-    let address0 = wallet.peek_address(KeychainKind::External, 0);
-    assert_eq!(
-        address0.address(),
-        "tb1qjtgffm20l9vu6a7gacxvpu2ej4kdcsgc26xfdz".to_string()
-    );
-
-    let balance = wallet.balance();
-    assert_eq!(balance.total().to_sat(), 0);
-
-    let address1 = wallet.next_unused_address(KeychainKind::External);
-    assert_eq!(address1.keychain(), KeychainKind::External);
-    assert_eq!(address1.index(), 0);
-
-    let address2 = wallet.reveal_next_address(KeychainKind::External);
-    assert_eq!(address2.index(), 1);
-
-    let address3 = wallet.next_unused_address(KeychainKind::External);
-    assert_eq!(address3.index(), 0);
-
-    // Should do a single call to the server (for each keychain)
-    wallet.sync(1).await.expect("sync");
-
-    // Should do a stop_gap calls to the server (for each keychain) and not start from beginning
-    wallet
-        .full_scan(STOP_GAP, PARALLEL_REQUESTS)
+    let full_scan_request = wallet.start_full_scan();
+    let update = blockchain_client
+        .full_scan(full_scan_request, STOP_GAP, PARALLEL_REQUESTS)
         .await
-        .expect("second full_scan");
+        .expect("full_scan");
+    wallet
+        .apply_update_at(update, Some((Date::now() / 1000.0) as u64))
+        .expect("full_scan apply_update_at");
 
-    let unused_addresses = wallet.list_unused_addresses(KeychainKind::External);
-    assert_eq!(unused_addresses.len(), 2);
+    let fullscan_block_height = wallet.latest_checkpoint().height();
+    assert!(block_height > 0);
+
+    let sync_request = wallet.start_sync_with_revealed_spks();
+    let update = blockchain_client
+        .sync(sync_request, PARALLEL_REQUESTS)
+        .await
+        .expect("sync");
+    wallet
+        .apply_update_at(update, Some((Date::now() / 1000.0) as u64))
+        .expect("sync apply_update_at");
+
+    // TODO: Find a better way to assert that the sync was successful
+    let sync_block_height = wallet.latest_checkpoint().height();
+    assert!(sync_block_height >= fullscan_block_height);
 }

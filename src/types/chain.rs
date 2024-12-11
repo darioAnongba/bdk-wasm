@@ -4,7 +4,7 @@ use bdk_core::spk_client::{
     FullScanRequest as BdkFullScanRequest, FullScanResult as BdkFullScanResult, SyncRequest as BdkSyncRequest,
     SyncResult as BdkSyncResult,
 };
-use bdk_wallet::KeychainKind;
+use bdk_wallet::{KeychainKind, Update as BdkUpdate};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Data required to perform a spk-based blockchain client sync.
@@ -13,55 +13,26 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// outpoints.
 #[wasm_bindgen]
 pub struct SyncRequest {
-    request: BdkSyncRequest<KeychainKind>,
+    request: BdkSyncRequest<(KeychainKind, u32)>,
 }
 
 impl Deref for SyncRequest {
-    type Target = BdkSyncRequest<KeychainKind>;
+    type Target = BdkSyncRequest<(KeychainKind, u32)>;
 
     fn deref(&self) -> &Self::Target {
         &self.request
     }
 }
 
-impl From<BdkSyncRequest<KeychainKind>> for SyncRequest {
-    fn from(request: BdkSyncRequest<KeychainKind>) -> Self {
+impl From<BdkSyncRequest<(KeychainKind, u32)>> for SyncRequest {
+    fn from(request: BdkSyncRequest<(KeychainKind, u32)>) -> Self {
         SyncRequest { request }
     }
 }
 
-impl From<SyncRequest> for BdkSyncRequest<KeychainKind> {
+impl From<SyncRequest> for BdkSyncRequest<(KeychainKind, u32)> {
     fn from(request: SyncRequest) -> Self {
         request.request
-    }
-}
-
-/// Data returned from a spk-based blockchain client sync.
-///
-/// See also [`SyncRequest`].
-#[wasm_bindgen]
-#[derive(Debug)]
-pub struct SyncResult {
-    result: BdkSyncResult,
-}
-
-impl Deref for SyncResult {
-    type Target = BdkSyncResult;
-
-    fn deref(&self) -> &Self::Target {
-        &self.result
-    }
-}
-
-impl From<BdkSyncResult> for SyncResult {
-    fn from(result: BdkSyncResult) -> Self {
-        SyncResult { result }
-    }
-}
-
-impl From<SyncResult> for BdkSyncResult {
-    fn from(result: SyncResult) -> Self {
-        result.result
     }
 }
 
@@ -96,31 +67,41 @@ impl From<FullScanRequest> for BdkFullScanRequest<KeychainKind> {
     }
 }
 
-/// Data returned from a spk-based blockchain client full scan.
-///
-/// See also [`FullScanRequest`].
+/// An update to [`Wallet`].
 #[wasm_bindgen]
 #[derive(Debug)]
-pub struct FullScanResult {
-    result: BdkFullScanResult<KeychainKind>,
+pub struct Update {
+    update: BdkUpdate,
 }
 
-impl Deref for FullScanResult {
-    type Target = BdkFullScanResult<KeychainKind>;
+impl Deref for Update {
+    type Target = BdkUpdate;
 
     fn deref(&self) -> &Self::Target {
-        &self.result
+        &self.update
     }
 }
 
-impl From<BdkFullScanResult<KeychainKind>> for FullScanResult {
+impl From<BdkUpdate> for Update {
+    fn from(update: BdkUpdate) -> Self {
+        Update { update }
+    }
+}
+
+impl From<Update> for BdkUpdate {
+    fn from(update: Update) -> Self {
+        update.update
+    }
+}
+
+impl From<BdkFullScanResult<KeychainKind>> for Update {
     fn from(result: BdkFullScanResult<KeychainKind>) -> Self {
-        FullScanResult { result }
+        Update { update: result.into() }
     }
 }
 
-impl From<FullScanResult> for BdkFullScanResult<KeychainKind> {
-    fn from(result: FullScanResult) -> Self {
-        result.result
+impl From<BdkSyncResult> for Update {
+    fn from(result: BdkSyncResult) -> Self {
+        Update { update: result.into() }
     }
 }

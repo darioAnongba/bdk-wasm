@@ -43,7 +43,7 @@ impl CheckPoint {
 
     /// Get checkpoint at `height`.
     ///
-    /// Returns `None` if checkpoint at `height` does not exist`.
+    /// Returns `None` if checkpoint at `height` does not exist.
     pub fn get(&self, height: u32) -> Option<Self> {
         self.checkpoint.get(height).map(Into::into)
     }

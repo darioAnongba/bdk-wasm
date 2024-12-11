@@ -8,7 +8,9 @@ use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 use crate::{
     bitcoin::{seed_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
     result::JsResult,
-    types::{AddressInfo, AddressType, Balance, CheckPoint, KeychainKind, Network},
+    types::{
+        AddressInfo, AddressType, Balance, CheckPoint, FullScanRequest, KeychainKind, Network, SyncRequest, Update,
+    },
 };
 
 #[wasm_bindgen]
@@ -86,6 +88,19 @@ impl Wallet {
         };
 
         Ok(Wallet { wallet })
+    }
+
+    pub fn start_full_scan(&self) -> FullScanRequest {
+        self.wallet.start_full_scan().build().into()
+    }
+
+    pub fn start_sync_with_revealed_spks(&self) -> SyncRequest {
+        self.wallet.start_sync_with_revealed_spks().build().into()
+    }
+
+    pub fn apply_update_at(&mut self, update: Update, seen_at: Option<u64>) -> JsResult<()> {
+        self.wallet.apply_update_at(update, seen_at)?;
+        Ok(())
     }
 
     pub fn network(&self) -> Network {
