@@ -43,7 +43,7 @@ impl SnapWallet {
             .create_wallet_async(&mut persister)
             .await?;
 
-        let client = Builder::new(&url).build_async()?;
+        let client = Builder::new(url).build_async()?;
 
         Ok(SnapWallet {
             wallet,
@@ -61,7 +61,7 @@ impl SnapWallet {
             None => return Err(JsError::new("Failed to load wallet, check the changeset")),
         };
 
-        let client = Builder::new(&url).build_async()?;
+        let client = Builder::new(url).build_async()?;
 
         Ok(SnapWallet {
             wallet,
@@ -86,8 +86,7 @@ impl SnapWallet {
         url: &str,
     ) -> JsResult<SnapWallet> {
         let (external_descriptor, internal_descriptor) =
-            seed_to_descriptor(seed, network.into(), address_type.into())
-                .map_err(|e| JsError::new(&e.to_string()))?;
+            seed_to_descriptor(seed, network.into(), address_type.into()).map_err(|e| JsError::new(&e.to_string()))?;
 
         Self::create(network, external_descriptor, internal_descriptor, url).await
     }
@@ -128,10 +127,7 @@ impl SnapWallet {
 
     pub async fn full_scan(&mut self, stop_gap: usize, parallel_requests: usize) -> JsResult<()> {
         let request = self.wallet.start_full_scan();
-        let update = self
-            .client
-            .full_scan(request, stop_gap, parallel_requests)
-            .await?;
+        let update = self.client.full_scan(request, stop_gap, parallel_requests).await?;
 
         let now = (Date::now() / 1000.0) as u64;
         self.wallet.apply_update_at(update, Some(now))?;
@@ -198,9 +194,6 @@ impl SnapWallet {
     }
 
     pub async fn persist(&mut self) -> JsResult<bool> {
-        self.wallet
-            .persist_async(&mut self.persister)
-            .await
-            .map_err(Into::into)
+        self.wallet.persist_async(&mut self.persister).await.map_err(Into::into)
     }
 }

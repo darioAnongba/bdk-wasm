@@ -2,8 +2,8 @@ use anyhow::{anyhow, Error};
 use bdk_wallet::{
     keys::{DerivableKey, ExtendedKey},
     template::{
-        Bip44, Bip44Public, Bip49, Bip49Public, Bip84, Bip84Public, Bip86, Bip86Public,
-        DescriptorTemplate, DescriptorTemplateOut,
+        Bip44, Bip44Public, Bip49, Bip49Public, Bip84, Bip84Public, Bip86, Bip86Public, DescriptorTemplate,
+        DescriptorTemplateOut,
     },
     KeychainKind,
 };
@@ -62,10 +62,7 @@ pub fn xpub_to_descriptor(
     }
 }
 
-pub fn slip10_to_extended(
-    node: SLIP10Node,
-    network: Network,
-) -> Result<ExtendedKey, anyhow::Error> {
+pub fn slip10_to_extended(node: SLIP10Node, network: Network) -> Result<ExtendedKey, anyhow::Error> {
     let parent_fingerprint: Fingerprint = node.parent_fingerprint.to_be_bytes().into();
     let chain_code = ChainCode::from_hex(strip_0x_prefix(&node.chain_code))?;
 

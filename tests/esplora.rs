@@ -33,13 +33,9 @@ async fn test_esplora_wallet() {
     };
 
     let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
-    let mut wallet = EsploraWallet::from_seed(&seed, NETWORK, ADDRESS_TYPE, esplora_url)
-        .expect("esplora_wallet");
+    let mut wallet = EsploraWallet::from_seed(&seed, NETWORK, ADDRESS_TYPE, esplora_url).expect("esplora_wallet");
 
-    wallet
-        .full_scan(STOP_GAP, PARALLEL_REQUESTS)
-        .await
-        .expect("full_scan");
+    wallet.full_scan(STOP_GAP, PARALLEL_REQUESTS).await.expect("full_scan");
 
     let address0 = wallet.peek_address(KeychainKind::External, 0);
     assert_eq!(

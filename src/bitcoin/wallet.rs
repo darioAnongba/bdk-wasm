@@ -18,11 +18,7 @@ pub struct Wallet {
 
 #[wasm_bindgen]
 impl Wallet {
-    fn create<D>(
-        network: Network,
-        external_descriptor: D,
-        internal_descriptor: D,
-    ) -> Result<Wallet, anyhow::Error>
+    fn create<D>(network: Network, external_descriptor: D, internal_descriptor: D) -> Result<Wallet, anyhow::Error>
     where
         D: IntoWalletDescriptor + Send + Clone + 'static,
     {
@@ -38,17 +34,14 @@ impl Wallet {
         external_descriptor: String,
         internal_descriptor: String,
     ) -> JsResult<Wallet> {
-        Self::create(network, external_descriptor, internal_descriptor)
-            .map_err(|e| JsError::new(&e.to_string()))
+        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
     }
 
     pub fn from_seed(seed: &[u8], network: Network, address_type: AddressType) -> JsResult<Wallet> {
         let (external_descriptor, internal_descriptor) =
-            seed_to_descriptor(seed, network.into(), address_type.into())
-                .map_err(|e| JsError::new(&e.to_string()))?;
+            seed_to_descriptor(seed, network.into(), address_type.into()).map_err(|e| JsError::new(&e.to_string()))?;
 
-        Self::create(network, external_descriptor, internal_descriptor)
-            .map_err(|e| JsError::new(&e.to_string()))
+        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
     }
 
     pub fn from_xpriv(
@@ -64,8 +57,7 @@ impl Wallet {
             xpriv_to_descriptor(xprv, fingerprint, network.into(), address_type.into())
                 .map_err(|e| JsError::new(&e.to_string()))?;
 
-        Self::create(network, external_descriptor, internal_descriptor)
-            .map_err(|e| JsError::new(&e.to_string()))
+        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
     }
 
     pub fn from_xpub(
@@ -81,8 +73,7 @@ impl Wallet {
             xpub_to_descriptor(xpub, fingerprint, network.into(), address_type.into())
                 .map_err(|e| JsError::new(&e.to_string()))?;
 
-        Self::create(network, external_descriptor, internal_descriptor)
-            .map_err(|e| JsError::new(&e.to_string()))
+        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
     }
 
     pub fn load(changeset: JsValue) -> JsResult<Wallet> {

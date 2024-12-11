@@ -10,14 +10,9 @@ use wasm_bindgen::prelude::{wasm_bindgen, JsError, JsValue};
 use super::result::JsResult;
 
 #[wasm_bindgen]
-pub fn seed_to_descriptor(
-    seed: &[u8],
-    network: Network,
-    address_type: AddressType,
-) -> JsResult<DescriptorPair> {
-    let (external, internal) =
-        crate::bitcoin::seed_to_descriptor(seed, network.into(), address_type.into())
-            .map_err(|e| JsError::new(&e.to_string()))?;
+pub fn seed_to_descriptor(seed: &[u8], network: Network, address_type: AddressType) -> JsResult<DescriptorPair> {
+    let (external, internal) = crate::bitcoin::seed_to_descriptor(seed, network.into(), address_type.into())
+        .map_err(|e| JsError::new(&e.to_string()))?;
 
     Ok(DescriptorPair::new(
         external.0.to_string_with_secret(&external.1),
@@ -59,16 +54,12 @@ pub fn xpub_to_descriptor(
         crate::bitcoin::xpub_to_descriptor(xpub, fingerprint, network.into(), address_type.into())
             .map_err(|e| JsError::new(&e.to_string()))?;
 
-    Ok(DescriptorPair::new(
-        external.0.to_string(),
-        internal.0.to_string(),
-    ))
+    Ok(DescriptorPair::new(external.0.to_string(), internal.0.to_string()))
 }
 
 #[wasm_bindgen]
 pub fn seed_to_xpriv(seed: &[u8], network: Network) -> JsResult<String> {
-    let xprv = crate::bitcoin::seed_to_xpriv(seed, network.into())
-        .map_err(|e| JsError::new(&e.to_string()))?;
+    let xprv = crate::bitcoin::seed_to_xpriv(seed, network.into()).map_err(|e| JsError::new(&e.to_string()))?;
 
     Ok(xprv.to_string())
 }
@@ -76,8 +67,8 @@ pub fn seed_to_xpriv(seed: &[u8], network: Network) -> JsResult<String> {
 #[wasm_bindgen]
 pub fn slip10_to_extended(slip10: JsValue, network: Network) -> JsResult<String> {
     let node: SLIP10Node = from_value(slip10.clone())?;
-    let extended_key = crate::bitcoin::slip10_to_extended(node, network.into())
-        .map_err(|e| JsError::new(&e.to_string()))?;
+    let extended_key =
+        crate::bitcoin::slip10_to_extended(node, network.into()).map_err(|e| JsError::new(&e.to_string()))?;
 
     match &extended_key {
         ExtendedKey::Private(xprv) => Ok(xprv.0.to_string()),

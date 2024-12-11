@@ -56,8 +56,7 @@ async fn test_xpriv_to_descriptor() {
     let xpriv = "tprv8g4stFEyX1zQoi4oNBdUFy4cDqWcyWu1kacHgK3RRvTdTPDm8HTxhERpV9JLTct69h4479xKJXm85SYkFZ4eMUsru5MdUNkeouuzbivKAJp";
     let fingerprint = "27f9035f";
 
-    let descriptors = xpriv_to_descriptor(xpriv, fingerprint, NETWORK, ADDRESS_TYPE)
-        .expect("xpriv_to_descriptor");
+    let descriptors = xpriv_to_descriptor(xpriv, fingerprint, NETWORK, ADDRESS_TYPE).expect("xpriv_to_descriptor");
 
     assert_eq!(
         descriptors.external(),
@@ -75,8 +74,7 @@ async fn test_xpub_to_descriptor() {
     let xpub = "tpubDCkv2fHDfPg5hB6bFqJ4fNiins2Z8r5vKtD4xq5irCG2HsUXkgHYsj3gfGTdvAv41hoJeXjfxu7EBQqZMm6SVkxztKFtaaE7HuLdkuL7KNq";
     let fingerprint = "27f9035f";
 
-    let descriptors =
-        xpub_to_descriptor(xpub, fingerprint, NETWORK, ADDRESS_TYPE).expect("xpub_to_descriptor");
+    let descriptors = xpub_to_descriptor(xpub, fingerprint, NETWORK, ADDRESS_TYPE).expect("xpub_to_descriptor");
 
     assert_eq!(
         descriptors.external(),
@@ -99,8 +97,7 @@ async fn test_wallet() {
     assert_eq!(balance.total(), 0);
 
     let initial_changeset_js = wallet.take_staged().expect("take_staged");
-    let initial_changeset: ChangeSet =
-        from_value(initial_changeset_js.clone()).expect("from_value");
+    let initial_changeset: ChangeSet = from_value(initial_changeset_js.clone()).expect("from_value");
     assert_eq!(initial_changeset.descriptor.unwrap().to_string(), "wpkh([27f9035f/84'/1'/0']tpubDCkv2fHDfPg5hB6bFqJ4fNiins2Z8r5vKtD4xq5irCG2HsUXkgHYsj3gfGTdvAv41hoJeXjfxu7EBQqZMm6SVkxztKFtaaE7HuLdkuL7KNq/0/*)#wle7e0wp");
     assert_eq!(
         initial_changeset.change_descriptor.unwrap().to_string(),
@@ -113,8 +110,6 @@ async fn test_wallet() {
     let address1 = wallet.reveal_next_address(KeychainKind::External);
     assert_eq!(address1.index(), 1);
 
-    let final_changeset_js = wallet
-        .take_merged(initial_changeset_js)
-        .expect("take_merged");
+    let final_changeset_js = wallet.take_merged(initial_changeset_js).expect("take_merged");
     assert!(!final_changeset_js.is_null() && !final_changeset_js.is_undefined());
 }
