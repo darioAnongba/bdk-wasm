@@ -50,7 +50,7 @@ async fn test_esplora_client() {
         .expect("full_scan apply_update_at");
 
     let fullscan_block_height = wallet.latest_checkpoint().height();
-    assert!(block_height > 0);
+    assert!(fullscan_block_height > 0);
 
     let sync_request = wallet.start_sync_with_revealed_spks();
     let update = blockchain_client
