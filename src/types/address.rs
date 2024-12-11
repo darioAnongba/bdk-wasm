@@ -60,7 +60,6 @@ impl From<BdkAddressInfo> for AddressInfo {
 /// The different types of addresses.
 #[wasm_bindgen]
 #[derive(Debug)]
-#[non_exhaustive]
 pub enum AddressType {
     /// Pay to pubkey hash.
     P2pkh,
@@ -68,6 +67,8 @@ pub enum AddressType {
     P2sh,
     /// Pay to witness pubkey hash.
     P2wpkh,
+    /// Pay to witness script hash.
+    P2wsh,
     /// Pay to taproot.
     P2tr,
 }
@@ -78,6 +79,7 @@ impl From<BdkAddressType> for AddressType {
             BdkAddressType::P2pkh => AddressType::P2pkh,
             BdkAddressType::P2sh => AddressType::P2sh,
             BdkAddressType::P2wpkh => AddressType::P2wpkh,
+            BdkAddressType::P2wsh => AddressType::P2wsh,
             BdkAddressType::P2tr => AddressType::P2tr,
             _ => panic!("Unsupported address type"),
         }
@@ -90,6 +92,7 @@ impl From<AddressType> for BdkAddressType {
             AddressType::P2pkh => BdkAddressType::P2pkh,
             AddressType::P2sh => BdkAddressType::P2sh,
             AddressType::P2wpkh => BdkAddressType::P2wpkh,
+            AddressType::P2wsh => BdkAddressType::P2wsh,
             AddressType::P2tr => BdkAddressType::P2tr,
         }
     }

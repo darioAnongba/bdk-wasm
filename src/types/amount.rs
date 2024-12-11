@@ -52,7 +52,6 @@ impl From<BdkAmount> for Amount {
 /// A set of denominations in which amounts can be expressed.
 #[wasm_bindgen]
 #[derive(Debug)]
-#[non_exhaustive]
 pub enum Denomination {
     /// BTC
     Bitcoin,
@@ -86,7 +85,7 @@ impl From<BdkDenomination> for Denomination {
             BdkDenomination::Bit => Denomination::Bit,
             BdkDenomination::Satoshi => Denomination::Satoshi,
             BdkDenomination::MilliSatoshi => Denomination::MilliSatoshi,
-            _ => panic!("Unsupported address type"),
+            _ => panic!("Unsupported denomination"),
         }
     }
 }
