@@ -6,7 +6,7 @@ extern crate wasm_bindgen_test;
 
 use bdk_wallet::bip39::Mnemonic;
 use bdk_wasm::{
-    bitcoin::EsploraWallet,
+    bitcoin::EsploraClient,
     set_panic_hook,
     types::{AddressType, KeychainKind, Network},
 };
@@ -33,7 +33,7 @@ async fn test_esplora_wallet() {
     };
 
     let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
-    let mut wallet = EsploraWallet::from_seed(&seed, NETWORK, ADDRESS_TYPE, esplora_url).expect("esplora_wallet");
+    let mut wallet = EsploraClient::from_seed(&seed, NETWORK, ADDRESS_TYPE, esplora_url).expect("esplora_wallet");
 
     wallet.full_scan(STOP_GAP, PARALLEL_REQUESTS).await.expect("full_scan");
 
