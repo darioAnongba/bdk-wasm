@@ -19,7 +19,6 @@ jobs:
           - debug,default
           - debug,esplora
           - debug,snap
-          - debug,bitcoind
     steps:
       - name: checkout
         uses: actions/checkout@v4
