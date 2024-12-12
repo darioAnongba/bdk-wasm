@@ -33,13 +33,13 @@ jobs:
       - name: Build
         run: |
           if [ "${{ matrix.features }}" = "all" ]; then
-            wasm-pack build --all-features
+            wasm-pack build --all-features -- --locked
           else
-            wasm-pack build --features ${{ matrix.features }}
+            wasm-pack build --features ${{ matrix.features }} -- --locked
           fi
       - name: Test
         if: ${{ matrix.features != 'all' }}
-        run: wasm-pack test --chrome --firefox --headless --features ${{ matrix.features }}
+        run: wasm-pack test --chrome --firefox --headless --features ${{ matrix.features }} -- --locked
 
   lint:
     name: Lint (fmt + clippy)
