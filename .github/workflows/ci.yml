@@ -57,4 +57,4 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --config format_code_in_doc_comments=true --check
       - name: Run Clippy
-        run: cargo clippy --all-features --all-targets -- -D warnings
+        run: cargo clippy --all-features --all-targets -- --locked -D warnings
