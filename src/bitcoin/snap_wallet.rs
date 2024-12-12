@@ -1,12 +1,7 @@
 use std::str::FromStr;
 
-use bdk_esplora::{
-    esplora_client::{AsyncClient, Builder},
-    EsploraAsyncExt,
-};
 use bdk_wallet::{descriptor::IntoWalletDescriptor, PersistedWallet, Wallet as BdkWallet};
 use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
-use js_sys::Date;
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 
@@ -14,7 +9,9 @@ use crate::{
     bitcoin::{seed_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
     result::JsResult,
     storage::SnapPersister,
-    types::{AddressInfo, AddressType, Balance, KeychainKind, Network},
+    types::{
+        AddressInfo, AddressType, Balance, CheckPoint, FullScanRequest, KeychainKind, Network, SyncRequest, Update,
+    },
 };
 
 const STORAGE_KEY: &str = "wallet";
@@ -22,18 +19,12 @@ const STORAGE_KEY: &str = "wallet";
 #[wasm_bindgen]
 pub struct SnapWallet {
     wallet: PersistedWallet<SnapPersister>,
-    client: AsyncClient,
     persister: SnapPersister,
 }
 
 #[wasm_bindgen]
 impl SnapWallet {
-    async fn create<D>(
-        network: Network,
-        external_descriptor: D,
-        internal_descriptor: D,
-        url: &str,
-    ) -> JsResult<SnapWallet>
+    async fn create<D>(network: Network, external_descriptor: D, internal_descriptor: D) -> JsResult<SnapWallet>
     where
         D: IntoWalletDescriptor + Send + Clone + 'static,
     {
@@ -43,16 +34,10 @@ impl SnapWallet {
             .create_wallet_async(&mut persister)
             .await?;
 
-        let client = Builder::new(url).build_async()?;
-
-        Ok(SnapWallet {
-            wallet,
-            client,
-            persister,
-        })
+        Ok(SnapWallet { wallet, persister })
     }
 
-    pub async fn load(url: &str) -> JsResult<SnapWallet> {
+    pub async fn load() -> JsResult<SnapWallet> {
         let mut persister = SnapPersister::new(STORAGE_KEY);
         let wallet_opt = BdkWallet::load().load_wallet_async(&mut persister).await?;
 
@@ -61,34 +46,22 @@ impl SnapWallet {
             None => return Err(JsError::new("Failed to load wallet, check the changeset")),
         };
 
-        let client = Builder::new(url).build_async()?;
-
-        Ok(SnapWallet {
-            wallet,
-            client,
-            persister,
-        })
+        Ok(SnapWallet { wallet, persister })
     }
 
     pub async fn from_descriptors(
         network: Network,
         external_descriptor: String,
         internal_descriptor: String,
-        url: &str,
     ) -> JsResult<SnapWallet> {
-        Self::create(network, external_descriptor, internal_descriptor, url).await
+        Self::create(network, external_descriptor, internal_descriptor).await
     }
 
-    pub async fn from_seed(
-        seed: &[u8],
-        network: Network,
-        address_type: AddressType,
-        url: &str,
-    ) -> JsResult<SnapWallet> {
+    pub async fn from_seed(seed: &[u8], network: Network, address_type: AddressType) -> JsResult<SnapWallet> {
         let (external_descriptor, internal_descriptor) =
             seed_to_descriptor(seed, network.into(), address_type.into()).map_err(|e| JsError::new(&e.to_string()))?;
 
-        Self::create(network, external_descriptor, internal_descriptor, url).await
+        Self::create(network, external_descriptor, internal_descriptor).await
     }
 
     pub async fn from_xpriv(
@@ -96,7 +69,6 @@ impl SnapWallet {
         fingerprint: &str,
         network: Network,
         address_type: AddressType,
-        url: &str,
     ) -> JsResult<SnapWallet> {
         let xprv = Xpriv::from_str(extended_privkey).map_err(|e| JsError::new(&e.to_string()))?;
         let fingerprint = Fingerprint::from_hex(fingerprint)?;
@@ -105,7 +77,7 @@ impl SnapWallet {
             xpriv_to_descriptor(xprv, fingerprint, network.into(), address_type.into())
                 .map_err(|e| JsError::new(&e.to_string()))?;
 
-        Self::create(network, external_descriptor, internal_descriptor, url).await
+        Self::create(network, external_descriptor, internal_descriptor).await
     }
 
     pub async fn from_xpub(
@@ -113,7 +85,6 @@ impl SnapWallet {
         fingerprint: &str,
         network: Network,
         address_type: AddressType,
-        url: &str,
     ) -> JsResult<SnapWallet> {
         let xpub = Xpub::from_str(extended_pubkey)?;
         let fingerprint = Fingerprint::from_hex(fingerprint)?;
@@ -122,26 +93,19 @@ impl SnapWallet {
             xpub_to_descriptor(xpub, fingerprint, network.into(), address_type.into())
                 .map_err(|e| JsError::new(&e.to_string()))?;
 
-        Self::create(network, external_descriptor, internal_descriptor, url).await
+        Self::create(network, external_descriptor, internal_descriptor).await
     }
 
-    pub async fn full_scan(&mut self, stop_gap: usize, parallel_requests: usize) -> JsResult<()> {
-        let request = self.wallet.start_full_scan();
-        let update = self.client.full_scan(request, stop_gap, parallel_requests).await?;
-
-        let now = (Date::now() / 1000.0) as u64;
-        self.wallet.apply_update_at(update, Some(now))?;
-
-        Ok(())
+    pub fn start_full_scan(&self) -> FullScanRequest {
+        self.wallet.start_full_scan().build().into()
     }
 
-    pub async fn sync(&mut self, parallel_requests: usize) -> JsResult<()> {
-        let request = self.wallet.start_sync_with_revealed_spks();
-        let update = self.client.sync(request, parallel_requests).await?;
+    pub fn start_sync_with_revealed_spks(&self) -> SyncRequest {
+        self.wallet.start_sync_with_revealed_spks().build().into()
+    }
 
-        let now = (Date::now() / 1000.0) as u64;
-        self.wallet.apply_update_at(update, Some(now))?;
-
+    pub fn apply_update_at(&mut self, update: Update, seen_at: Option<u64>) -> JsResult<()> {
+        self.wallet.apply_update_at(update, seen_at)?;
         Ok(())
     }
 
@@ -191,6 +155,10 @@ impl SnapWallet {
             .transactions()
             .map(|tx| to_value(&tx.tx_node.tx).map_err(Into::into))
             .collect()
+    }
+
+    pub fn latest_checkpoint(&self) -> CheckPoint {
+        self.wallet.latest_checkpoint().into()
     }
 
     pub async fn persist(&mut self) -> JsResult<bool> {
