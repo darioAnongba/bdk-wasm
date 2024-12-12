@@ -33,13 +33,13 @@ jobs:
       - name: Build
         run: |
           if [ "${{ matrix.features }}" = "all" ]; then
-            wasm-pack build --all-features -- --locked
+            wasm-pack build --locked --all-features
           else
-            wasm-pack build --features ${{ matrix.features }} -- --locked
+            wasm-pack build --locked --features ${{ matrix.features }}
           fi
       - name: Test
         if: ${{ matrix.features != 'all' }}
-        run: wasm-pack test --chrome --firefox --headless --features ${{ matrix.features }} -- --locked
+        run: wasm-pack test --locked --chrome --firefox --headless --features ${{ matrix.features }}
 
   lint:
     name: Lint (fmt + clippy)
@@ -57,4 +57,4 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --config format_code_in_doc_comments=true --check
       - name: Run Clippy
-        run: cargo clippy --all-features --all-targets -- --locked -D warnings
+        run: cargo clippy --locked --all-features --all-targets -- -D warnings
