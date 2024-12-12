@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use bdk_wallet::{chain::Merge, descriptor::IntoWalletDescriptor, ChangeSet, Wallet as BdkWallet};
 use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
+use js_sys::Date;
 use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 
@@ -96,6 +97,10 @@ impl Wallet {
 
     pub fn start_sync_with_revealed_spks(&self) -> SyncRequest {
         self.wallet.start_sync_with_revealed_spks().build().into()
+    }
+
+    pub fn apply_update(&mut self, update: Update) -> JsResult<()> {
+        self.apply_update_at(update, Some((Date::now() / 1000.0) as u64))
     }
 
     pub fn apply_update_at(&mut self, update: Update, seen_at: Option<u64>) -> JsResult<()> {

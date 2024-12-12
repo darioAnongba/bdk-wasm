@@ -45,9 +45,7 @@ async fn test_esplora_client() {
         .full_scan(full_scan_request, STOP_GAP, PARALLEL_REQUESTS)
         .await
         .expect("full_scan");
-    wallet
-        .apply_update_at(update, Some((Date::now() / 1000.0) as u64))
-        .expect("full_scan apply_update_at");
+    wallet.apply_update(update).expect("full_scan apply_update_at");
 
     let fullscan_block_height = wallet.latest_checkpoint().height();
     assert!(fullscan_block_height > 0);
