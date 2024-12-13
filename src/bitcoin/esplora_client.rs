@@ -10,17 +10,23 @@ use crate::{
     result::JsResult,
     types::{FullScanRequest, SyncRequest, Update},
 };
+use std::time::Duration;
+
+use bdk_esplora::esplora_client::Sleeper;
+use gloo_timers::future::{sleep, TimeoutFuture};
+
+use crate::utils::SendSyncWrapper;
 
 #[wasm_bindgen]
 pub struct EsploraClient {
-    client: AsyncClient,
+    client: AsyncClient<WebSleeper>,
 }
 
 #[wasm_bindgen]
 impl EsploraClient {
     #[wasm_bindgen(constructor)]
     pub fn new(url: &str) -> JsResult<EsploraClient> {
-        let client = Builder::new(url).build_async()?;
+        let client = Builder::new(url).build_async_with_sleeper::<WebSleeper>()?;
         Ok(EsploraClient { client })
     }
 
@@ -39,5 +45,16 @@ impl EsploraClient {
         let request: BdkSyncRequest<(KeychainKind, u32)> = request.into();
         let result = self.client.sync(request, parallel_requests).await?;
         Ok(result.into())
+    }
+}
+
+#[derive(Clone)]
+struct WebSleeper;
+
+impl Sleeper for WebSleeper {
+    type Sleep = SendSyncWrapper<TimeoutFuture>;
+
+    fn sleep(dur: Duration) -> Self::Sleep {
+        SendSyncWrapper(sleep(dur))
     }
 }

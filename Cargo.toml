@@ -28,11 +28,11 @@ debug = ["console_error_panic_hook"]
 snap = ["default"]
 
 [dependencies]
-wasm-bindgen = "0.2.95"
-wasm-bindgen-futures = "0.4.45"
-anyhow = "1.0.93"
-thiserror = "2.0.3"
-serde = { version = "1.0.215", default-features = false, features = ["derive"] }
+wasm-bindgen = "0.2.99"
+wasm-bindgen-futures = "0.4.49"
+anyhow = "1.0.94"
+thiserror = "2.0.6"
+serde = { version = "1.0.216", default-features = false, features = ["derive"] }
 js-sys = "0.3.76"
 serde-wasm-bindgen = "0.6.5"
 rmp-serde = "1.3.0"
@@ -40,23 +40,24 @@ rmp-serde = "1.3.0"
 # Compatibility to compile to WASM
 getrandom = { version = "0.2.15", features = ["js"] }
 ring = { version = "0.17.8", features = ["wasm32_unknown_unknown_js"] }
+gloo-timers = { version = "0.3.0", features = ["futures"] }
 
 # Bitcoin dependencies
-bdk_wallet = { version = "1.0.0-beta.5" }
-bdk_esplora = { version = "0.19", default-features = false, features = [
+bdk_wallet = { version = "1.0.0-beta.6" }
+bdk_esplora = { version = "0.20", default-features = false, features = [
     "async-https",
 ], optional = true }
-bitcoin = { version = "0.32.4", default-features = false }
-miniscript = "12.2.0"
-bdk_core = "0.3.0"
+bitcoin = { version = "0.32.5", default-features = false }
+miniscript = "12.3.0"
+bdk_core = "0.4.0"
 
 # Debug dependencies
 console_error_panic_hook = { version = "0.1.7", optional = true }
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.45"
-web-sys = { version = "0.3.72", features = ["console"] }
-bdk_wallet = { version = "1.0.0-beta.5", features = ["keys-bip39"] }
+wasm-bindgen-test = "0.3.49"
+web-sys = { version = "0.3.76", features = ["console"] }
+bdk_wallet = { version = "1.0.0-beta.6", features = ["keys-bip39"] }
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.

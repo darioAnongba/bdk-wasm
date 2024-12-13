@@ -1,6 +1,6 @@
 use std::{collections::HashMap, future::Future, pin::Pin};
 
-use crate::{types::SnapPersisterError, SendFuture};
+use crate::{types::SnapPersisterError, SendSyncWrapper};
 use bdk_wallet::{chain::Merge, AsyncWalletPersister, ChangeSet};
 use bitcoin::base64::{prelude::BASE64_STANDARD, Engine};
 use js_sys::Promise;
@@ -97,7 +97,7 @@ impl AsyncWalletPersister for SnapPersister {
         Self: 'a,
     {
         let fut = async move { persister.read_changeset().await };
-        let send_fut = SendFuture(fut);
+        let send_fut = SendSyncWrapper(fut);
         Box::pin(send_fut)
     }
 
@@ -109,7 +109,7 @@ impl AsyncWalletPersister for SnapPersister {
         Self: 'a,
     {
         let fut = async move { persister.write_changeset(changeset).await };
-        let send_fut = SendFuture(fut);
+        let send_fut = SendSyncWrapper(fut);
         Box::pin(send_fut)
     }
 }

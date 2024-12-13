@@ -1,8 +1,8 @@
 use std::ops::Deref;
 
 use bdk_core::spk_client::{
-    FullScanRequest as BdkFullScanRequest, FullScanResult as BdkFullScanResult, SyncRequest as BdkSyncRequest,
-    SyncResult as BdkSyncResult,
+    FullScanRequest as BdkFullScanRequest, FullScanResponse as BdkFullScanResponse, SyncRequest as BdkSyncRequest,
+    SyncResponse as BdkSyncResponse,
 };
 use bdk_wallet::{KeychainKind, Update as BdkUpdate};
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -94,14 +94,14 @@ impl From<Update> for BdkUpdate {
     }
 }
 
-impl From<BdkFullScanResult<KeychainKind>> for Update {
-    fn from(result: BdkFullScanResult<KeychainKind>) -> Self {
+impl From<BdkFullScanResponse<KeychainKind>> for Update {
+    fn from(result: BdkFullScanResponse<KeychainKind>) -> Self {
         Update { update: result.into() }
     }
 }
 
-impl From<BdkSyncResult> for Update {
-    fn from(result: BdkSyncResult) -> Self {
+impl From<BdkSyncResponse> for Update {
+    fn from(result: BdkSyncResponse) -> Self {
         Update { update: result.into() }
     }
 }

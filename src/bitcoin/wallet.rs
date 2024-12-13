@@ -100,10 +100,10 @@ impl Wallet {
     }
 
     pub fn apply_update(&mut self, update: Update) -> JsResult<()> {
-        self.apply_update_at(update, Some((Date::now() / 1000.0) as u64))
+        self.apply_update_at(update, (Date::now() / 1000.0) as u64)
     }
 
-    pub fn apply_update_at(&mut self, update: Update, seen_at: Option<u64>) -> JsResult<()> {
+    pub fn apply_update_at(&mut self, update: Update, seen_at: u64) -> JsResult<()> {
         self.wallet.apply_update_at(update, seen_at)?;
         Ok(())
     }

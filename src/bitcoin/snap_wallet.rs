@@ -104,7 +104,7 @@ impl SnapWallet {
         self.wallet.start_sync_with_revealed_spks().build().into()
     }
 
-    pub fn apply_update_at(&mut self, update: Update, seen_at: Option<u64>) -> JsResult<()> {
+    pub fn apply_update_at(&mut self, update: Update, seen_at: u64) -> JsResult<()> {
         self.wallet.apply_update_at(update, seen_at)?;
         Ok(())
     }

@@ -2,12 +2,13 @@ use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-// Wrap a future that is not `Send` and make it `Send`
-pub struct SendFuture<F>(pub F);
+// Wrap a future that is not `Send` or `Sync` and make it `Send` and `Sync`
+pub struct SendSyncWrapper<F>(pub F);
 
-unsafe impl<F> Send for SendFuture<F> {}
+unsafe impl<F> Send for SendSyncWrapper<F> {}
+unsafe impl<F> Sync for SendSyncWrapper<F> {}
 
-impl<F> Future for SendFuture<F>
+impl<F> Future for SendSyncWrapper<F>
 where
     F: Future,
 {
