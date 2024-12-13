@@ -59,4 +59,7 @@ async fn test_esplora_client() {
 
     let balance = wallet.balance();
     assert!(balance.total().to_sat() > 0);
+
+    let loaded_wallet = Wallet::load(wallet.take_staged().unwrap()).expect("load");
+    assert_eq!(loaded_wallet.balance(), wallet.balance());
 }
