@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use bdk_wallet::{chain::Merge, descriptor::IntoWalletDescriptor, ChangeSet, Wallet as BdkWallet};
+use bdk_wallet::{descriptor::IntoWalletDescriptor, Wallet as BdkWallet};
 use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
 use js_sys::Date;
 use serde_wasm_bindgen::{from_value, to_value};
@@ -10,7 +10,8 @@ use crate::{
     bitcoin::{seed_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
     result::JsResult,
     types::{
-        AddressInfo, AddressType, Balance, CheckPoint, FullScanRequest, KeychainKind, Network, SyncRequest, Update,
+        AddressInfo, AddressType, Balance, ChangeSet, CheckPoint, FullScanRequest, KeychainKind, Network, SyncRequest,
+        Update,
     },
 };
 
@@ -160,21 +161,11 @@ impl Wallet {
         self.wallet.latest_checkpoint().into()
     }
 
-    pub fn take_staged(&mut self) -> JsResult<JsValue> {
-        match self.wallet.take_staged() {
-            Some(changeset) => Ok(to_value(&changeset)?),
-            None => Ok(JsValue::null()),
-        }
+    pub fn take_staged(&mut self) -> Option<ChangeSet> {
+        self.wallet.take_staged().map(Into::into)
     }
 
-    pub fn take_merged(&mut self, previous: JsValue) -> JsResult<JsValue> {
-        match self.wallet.take_staged() {
-            Some(curr_changeset) => {
-                let mut changeset: ChangeSet = from_value(previous)?;
-                changeset.merge(curr_changeset);
-                Ok(to_value(&changeset)?)
-            }
-            None => Ok(JsValue::null()),
-        }
+    pub fn public_descriptor(&self, keychain: KeychainKind) -> String {
+        self.wallet.public_descriptor(keychain.into()).to_string()
     }
 }
