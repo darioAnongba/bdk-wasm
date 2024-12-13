@@ -3,7 +3,7 @@ use std::str::FromStr;
 use bdk_wallet::{descriptor::IntoWalletDescriptor, Wallet as BdkWallet};
 use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
 use js_sys::Date;
-use serde_wasm_bindgen::{from_value, to_value};
+use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 
 use crate::{
@@ -80,9 +80,8 @@ impl Wallet {
         Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
     }
 
-    pub fn load(changeset: JsValue) -> JsResult<Wallet> {
-        let changeset = from_value(changeset)?;
-        let wallet_opt = BdkWallet::load().load_wallet_no_persist(changeset)?;
+    pub fn load(changeset: ChangeSet) -> JsResult<Wallet> {
+        let wallet_opt = BdkWallet::load().load_wallet_no_persist(changeset.into())?;
 
         let wallet = match wallet_opt {
             Some(wallet) => wallet,
