@@ -7,7 +7,7 @@ extern crate wasm_bindgen_test;
 use bdk_wasm::{
     bitcoin::{EsploraClient, Wallet},
     set_panic_hook,
-    types::{KeychainKind, Network},
+    types::{DescriptorPair, KeychainKind, Network},
 };
 use wasm_bindgen_test::*;
 
@@ -33,7 +33,7 @@ async fn test_esplora_client() {
     };
 
     let mut wallet =
-        Wallet::from_descriptors(NETWORK, EXTERNAL_DESC.to_string(), INTERNAL_DESC.to_string()).expect("wallet");
+        Wallet::create(NETWORK, DescriptorPair::new(EXTERNAL_DESC.into(), INTERNAL_DESC.into())).expect("wallet");
     let mut blockchain_client = EsploraClient::new(esplora_url).expect("esplora_client");
 
     let block_height = wallet.latest_checkpoint().height();
