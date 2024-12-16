@@ -34,8 +34,8 @@ impl ChangeSet {
     }
 
     /// Serialize `ChangeSet` to JSON compatible with WASM.
-    pub fn to_js(&self) -> JsResult<JsValue> {
-        to_value(&self.changeset).map_err(Into::into)
+    pub fn to_js(&self) -> JsValue {
+        to_value(&self.changeset).expect("Serialization should not fail")
     }
 
     /// Create a new `ChangeSet` from a JSON string.
