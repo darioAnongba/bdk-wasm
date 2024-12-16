@@ -42,8 +42,8 @@ impl Deref for Amount {
 }
 
 impl From<BdkAmount> for Amount {
-    fn from(amount: BdkAmount) -> Self {
-        Amount(amount)
+    fn from(inner: BdkAmount) -> Self {
+        Amount(inner)
     }
 }
 

@@ -1,9 +1,8 @@
 use bdk_wallet::KeychainKind as BdkKeychainKind;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[wasm_bindgen]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// Types of keychains
+#[wasm_bindgen]
 pub enum KeychainKind {
     /// External keychain, used for deriving recipient addresses.
     External,

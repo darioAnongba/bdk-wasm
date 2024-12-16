@@ -50,8 +50,8 @@ impl Deref for AddressInfo {
 }
 
 impl From<BdkAddressInfo> for AddressInfo {
-    fn from(address: BdkAddressInfo) -> Self {
-        AddressInfo(address)
+    fn from(inner: BdkAddressInfo) -> Self {
+        AddressInfo(inner)
     }
 }
 
