@@ -25,13 +25,11 @@ crate-type = ["cdylib", "rlib"]
 default = []
 esplora = ["bdk_esplora"]
 debug = ["console_error_panic_hook"]
-snap = ["default"]
 
 [dependencies]
 wasm-bindgen = "0.2.99"
 wasm-bindgen-futures = "0.4.49"
 anyhow = "1.0.94"
-thiserror = "2.0.6"
 serde = { version = "1.0.216", default-features = false, features = ["derive"] }
 js-sys = "0.3.76"
 serde-wasm-bindgen = "0.6.5"
