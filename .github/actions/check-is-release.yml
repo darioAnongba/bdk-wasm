@@ -40,6 +40,5 @@ jobs:
             echo "No version bump detected."
             echo "is_release=false" >> "$GITHUB_OUTPUT"
           fi
-
-outputs:
-  is_release: ${{ steps.check-release.outputs.is_release }}
+    outputs:
+      is_release: ${{ steps.check-release.outputs.is_release }}
