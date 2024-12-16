@@ -7,7 +7,7 @@ extern crate wasm_bindgen_test;
 use bdk_wallet::bip39::Mnemonic;
 use bdk_wasm::{
     bitcoin::Wallet,
-    set_panic_hook,
+    seed_to_descriptor, set_panic_hook,
     types::{AddressType, ChangeSet, KeychainKind, Network},
 };
 use wasm_bindgen_test::*;
@@ -23,7 +23,8 @@ async fn test_wallet() {
     set_panic_hook();
 
     let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
-    let mut wallet = Wallet::from_seed(&seed, NETWORK, ADDRESS_TYPE).expect("wallet");
+    let descriptors = seed_to_descriptor(&seed, NETWORK, ADDRESS_TYPE).expect("seed_to_descriptor");
+    let mut wallet = Wallet::create(NETWORK, descriptors).expect("wallet");
 
     let balance = wallet.balance();
     assert_eq!(balance.total().to_sat(), 0);
@@ -48,7 +49,8 @@ async fn test_changeset() {
     set_panic_hook();
 
     let seed = Mnemonic::parse(MNEMONIC).unwrap().to_seed("");
-    let mut wallet = Wallet::from_seed(&seed, NETWORK, ADDRESS_TYPE).expect("wallet");
+    let descriptors = seed_to_descriptor(&seed, NETWORK, ADDRESS_TYPE).expect("seed_to_descriptor");
+    let mut wallet = Wallet::create(NETWORK, descriptors).expect("wallet");
 
     let mut changeset = wallet.take_staged().expect("initial_changeset");
     assert!(!changeset.is_empty());
