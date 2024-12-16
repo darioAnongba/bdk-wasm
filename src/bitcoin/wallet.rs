@@ -1,17 +1,13 @@
-use std::str::FromStr;
-
-use bdk_wallet::{descriptor::IntoWalletDescriptor, Wallet as BdkWallet};
-use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
+use bdk_wallet::Wallet as BdkWallet;
 use js_sys::Date;
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 
 use crate::{
-    bitcoin::{seed_to_descriptor, xpriv_to_descriptor, xpub_to_descriptor},
     result::JsResult,
     types::{
-        AddressInfo, AddressType, Balance, ChangeSet, CheckPoint, FullScanRequest, KeychainKind, Network, SyncRequest,
-        Update,
+        AddressInfo, Balance, ChangeSet, CheckPoint, DescriptorPair, FullScanRequest, KeychainKind, Network,
+        SyncRequest, Update,
     },
 };
 
@@ -22,62 +18,12 @@ pub struct Wallet {
 
 #[wasm_bindgen]
 impl Wallet {
-    fn create<D>(network: Network, external_descriptor: D, internal_descriptor: D) -> Result<Wallet, anyhow::Error>
-    where
-        D: IntoWalletDescriptor + Send + Clone + 'static,
-    {
-        let wallet = BdkWallet::create(external_descriptor, internal_descriptor)
+    pub fn create(network: Network, descriptors: DescriptorPair) -> JsResult<Wallet> {
+        let wallet = BdkWallet::create(descriptors.external(), descriptors.internal())
             .network(network.into())
             .create_wallet_no_persist()?;
 
         Ok(Wallet { wallet })
-    }
-
-    pub fn from_descriptors(
-        network: Network,
-        external_descriptor: String,
-        internal_descriptor: String,
-    ) -> JsResult<Wallet> {
-        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
-    }
-
-    pub fn from_seed(seed: &[u8], network: Network, address_type: AddressType) -> JsResult<Wallet> {
-        let (external_descriptor, internal_descriptor) =
-            seed_to_descriptor(seed, network.into(), address_type.into()).map_err(|e| JsError::new(&e.to_string()))?;
-
-        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
-    }
-
-    pub fn from_xpriv(
-        extended_privkey: &str,
-        fingerprint: &str,
-        network: Network,
-        address_type: AddressType,
-    ) -> JsResult<Wallet> {
-        let xprv = Xpriv::from_str(extended_privkey).map_err(|e| JsError::new(&e.to_string()))?;
-        let fingerprint = Fingerprint::from_hex(fingerprint)?;
-
-        let (external_descriptor, internal_descriptor) =
-            xpriv_to_descriptor(xprv, fingerprint, network.into(), address_type.into())
-                .map_err(|e| JsError::new(&e.to_string()))?;
-
-        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
-    }
-
-    pub fn from_xpub(
-        extended_pubkey: &str,
-        fingerprint: &str,
-        network: Network,
-        address_type: AddressType,
-    ) -> JsResult<Wallet> {
-        let xpub = Xpub::from_str(extended_pubkey)?;
-        let fingerprint = Fingerprint::from_hex(fingerprint)?;
-
-        let (external_descriptor, internal_descriptor) =
-            xpub_to_descriptor(xpub, fingerprint, network.into(), address_type.into())
-                .map_err(|e| JsError::new(&e.to_string()))?;
-
-        Self::create(network, external_descriptor, internal_descriptor).map_err(|e| JsError::new(&e.to_string()))
     }
 
     pub fn load(changeset: ChangeSet) -> JsResult<Wallet> {
