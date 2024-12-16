@@ -3,6 +3,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Types of keychains
 #[wasm_bindgen]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeychainKind {
     /// External keychain, used for deriving recipient addresses.
     External,
