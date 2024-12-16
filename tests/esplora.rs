@@ -29,6 +29,7 @@ async fn test_esplora_client() {
         Network::Testnet4 => "https://blockstream.info/testnet/api",
         Network::Signet => "https://mutinynet.com/api",
         Network::Regtest => "https://localhost:3000",
+        _ => panic!("unsupported network"),
     };
 
     let mut wallet =

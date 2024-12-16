@@ -6,15 +6,15 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Network {
     /// Mainnet Bitcoin.
-    Bitcoin,
+    Bitcoin = "bitcoin",
     /// Bitcoin's testnet network.
-    Testnet,
+    Testnet = "testnet",
     /// Bitcoin's testnet4 network.
-    Testnet4,
+    Testnet4 = "testnet4",
     /// Bitcoin's signet network.
-    Signet,
+    Signet = "signet",
     /// Bitcoin's regtest network.
-    Regtest,
+    Regtest = "regtest",
 }
 
 impl From<BdkNetwork> for Network {
@@ -37,6 +37,7 @@ impl From<Network> for BdkNetwork {
             Network::Testnet4 => BdkNetwork::Testnet4,
             Network::Signet => BdkNetwork::Signet,
             Network::Regtest => BdkNetwork::Regtest,
+            _ => BdkNetwork::Bitcoin,
         }
     }
 }
