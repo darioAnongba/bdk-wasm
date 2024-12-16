@@ -62,15 +62,15 @@ impl From<BdkAddressInfo> for AddressInfo {
 #[derive(Debug)]
 pub enum AddressType {
     /// Pay to pubkey hash.
-    P2pkh,
+    P2pkh = "p2pkh",
     /// Pay to script hash.
-    P2sh,
+    P2sh = "p2sh",
     /// Pay to witness pubkey hash.
-    P2wpkh,
+    P2wpkh = "p2wpkh",
     /// Pay to witness script hash.
-    P2wsh,
+    P2wsh = "p2wsh",
     /// Pay to taproot.
-    P2tr,
+    P2tr = "p2tr",
 }
 
 impl From<BdkAddressType> for AddressType {
@@ -94,6 +94,7 @@ impl From<AddressType> for BdkAddressType {
             AddressType::P2wpkh => BdkAddressType::P2wpkh,
             AddressType::P2wsh => BdkAddressType::P2wsh,
             AddressType::P2tr => BdkAddressType::P2tr,
+            _ => panic!("Unsupported address type"),
         }
     }
 }

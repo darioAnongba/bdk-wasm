@@ -54,23 +54,23 @@ impl From<BdkAmount> for Amount {
 #[derive(Debug)]
 pub enum Denomination {
     /// BTC
-    Bitcoin,
+    Bitcoin = "BTC",
     /// cBTC
-    CentiBitcoin,
+    CentiBitcoin = "cBTC",
     /// mBTC
-    MilliBitcoin,
+    MilliBitcoin = "mBTC",
     /// uBTC
-    MicroBitcoin,
+    MicroBitcoin = "uBTC",
     /// nBTC
-    NanoBitcoin,
+    NanoBitcoin = "nBTC",
     /// pBTC
-    PicoBitcoin,
+    PicoBitcoin = "pBTC",
     /// bits
-    Bit,
+    Bit = "bits",
     /// satoshi
-    Satoshi,
+    Satoshi = "satoshi",
     /// msat
-    MilliSatoshi,
+    MilliSatoshi = "msat",
 }
 
 impl From<BdkDenomination> for Denomination {
@@ -102,6 +102,7 @@ impl From<Denomination> for BdkDenomination {
             Denomination::Bit => BdkDenomination::Bit,
             Denomination::Satoshi => BdkDenomination::Satoshi,
             Denomination::MilliSatoshi => BdkDenomination::MilliSatoshi,
+            _ => panic!("Unsupported denomination"),
         }
     }
 }
