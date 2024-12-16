@@ -1,0 +1,44 @@
+name: Check if Release
+
+on:
+  workflow_call:
+    inputs:
+      base_ref:
+        description: "The base branch or commit for comparison"
+        required: true
+        type: string
+    outputs:
+      IS_RELEASE:
+        description: "True if Cargo.toml version has been updated"
+        value: ${{ steps.check-release.outputs.is_release }}
+
+jobs:
+  check-is-release:
+    name: Check Cargo.toml for Version Bump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compare Cargo.toml versions
+        id: check-release
+        run: |
+          # Extract the version from the current Cargo.toml
+          current_version=$(grep '^version' Cargo.toml | sed 's/version = "//' | sed 's/"//')
+
+          # Extract the version from the previous commit's Cargo.toml
+          git fetch origin ${{ inputs.base_ref }}
+          previous_version=$(git show origin/${{ inputs.base_ref }}:Cargo.toml | grep '^version' | sed 's/version = "//' | sed 's/"//')
+
+          echo "Current version: $current_version"
+          echo "Previous version: $previous_version"
+
+          if [ "$current_version" != "$previous_version" ]; then
+            echo "Version bump detected."
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No version bump detected."
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          fi
+    outputs:
+      is_release: ${{ steps.check-release.outputs.is_release }}
