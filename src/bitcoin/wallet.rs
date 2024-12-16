@@ -1,4 +1,4 @@
-use bdk_wallet::{descriptor::IntoWalletDescriptor, Wallet as BdkWallet};
+use bdk_wallet::Wallet as BdkWallet;
 use js_sys::Date;
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
@@ -18,19 +18,12 @@ pub struct Wallet {
 
 #[wasm_bindgen]
 impl Wallet {
-    fn _create<D>(network: Network, external_descriptor: D, internal_descriptor: D) -> Result<Wallet, anyhow::Error>
-    where
-        D: IntoWalletDescriptor + Send + Clone + 'static,
-    {
-        let wallet = BdkWallet::create(external_descriptor, internal_descriptor)
+    pub fn create(network: Network, descriptors: DescriptorPair) -> JsResult<Wallet> {
+        let wallet = BdkWallet::create(descriptors.external(), descriptors.internal())
             .network(network.into())
             .create_wallet_no_persist()?;
 
         Ok(Wallet { wallet })
-    }
-
-    pub fn create(network: Network, descriptors: DescriptorPair) -> JsResult<Wallet> {
-        Self::_create(network, descriptors.external(), descriptors.internal()).map_err(|e| JsError::new(&e.to_string()))
     }
 
     pub fn load(changeset: ChangeSet) -> JsResult<Wallet> {
