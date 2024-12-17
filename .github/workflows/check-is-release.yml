@@ -10,7 +10,7 @@ on:
     outputs:
       IS_RELEASE:
         description: "True if Cargo.toml version has been updated"
-        value: ${{ steps.check-release.outputs.is_release }}
+        value: ${{ jobs.check-is-release.outputs.is_release }}
 
 jobs:
   check-is-release:

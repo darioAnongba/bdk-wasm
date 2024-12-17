@@ -51,7 +51,7 @@ jobs:
       IS_RELEASE: ${{ steps.is-release.outputs.is_release }}
     steps:
       - name: Check if Cargo.toml version was upgraded
-        uses: ./.github/actions/check-is-release.yml
+        uses: ./.github/workflows/check-is-release.yml
         id: is-release
         with:
           base_ref: main
