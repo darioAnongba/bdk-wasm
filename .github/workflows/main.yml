@@ -45,14 +45,10 @@ jobs:
 
   is-release:
     needs: all-jobs-pass
-    runs-on: ubuntu-latest
-    outputs:
-      IS_RELEASE: ${{ steps.is-release.outputs.IS_RELEASE }}
-    steps:
-      - name: Check if Cargo.toml version was upgraded
-        uses: ./.github/actions/check-is-release.yml
-        with:
-          base_ref: main
+    name: Check if release
+    uses: ./.github/workflows/check-is-release.yml
+    with:
+      base_ref: main
 
   publish-release:
     needs: is-release
