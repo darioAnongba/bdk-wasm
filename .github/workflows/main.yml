@@ -51,7 +51,6 @@ jobs:
 
   is-release:
     needs: all-jobs-pass
-    if: github.event_name == 'push'
     name: Check if release
     uses: ./.github/workflows/check-is-release.yml
     with:
