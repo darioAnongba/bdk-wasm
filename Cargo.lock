@@ -90,6 +90,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
+name = "bdk-wasm"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "bdk_core",
+ "bdk_esplora",
+ "bdk_wallet",
+ "bitcoin",
+ "console_error_panic_hook",
+ "getrandom",
+ "gloo-timers",
+ "js-sys",
+ "miniscript",
+ "ring",
+ "rmp-serde",
+ "serde",
+ "serde-wasm-bindgen",
+ "thiserror 2.0.6",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasm-bindgen-test",
+ "web-sys",
+]
+
+[[package]]
 name = "bdk_chain"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -137,31 +162,6 @@ dependencies = [
  "rand_core",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "bdk_wasm"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "bdk_core",
- "bdk_esplora",
- "bdk_wallet",
- "bitcoin",
- "console_error_panic_hook",
- "getrandom",
- "gloo-timers",
- "js-sys",
- "miniscript",
- "ring",
- "rmp-serde",
- "serde",
- "serde-wasm-bindgen",
- "thiserror 2.0.6",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "wasm-bindgen-test",
- "web-sys",
 ]
 
 [[package]]

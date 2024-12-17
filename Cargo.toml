@@ -1,5 +1,5 @@
 [package]
-name = "bdk_wasm"
+name = "bdk-wasm"
 version = "0.1.1"
 repository = "https://github.com/MetaMask/bdk-wasm"
 description = "A modern, lightweight, descriptor-based wallet library for WASM and JS/TS"
@@ -11,6 +11,9 @@ keywords = [
     "wasm",
     "js",
     "typescript",
+    "bdk",
+    "browser",
+    "node",
 ]
 readme = "README.md"
 license = "MIT OR Apache-2.0"
