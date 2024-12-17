@@ -18,14 +18,16 @@ use gloo_timers::future::{sleep, TimeoutFuture};
 use crate::utils::SendSyncWrapper;
 
 #[wasm_bindgen]
-pub struct EsploraClient(AsyncClient<WebSleeper>);
+pub struct EsploraClient {
+    client: AsyncClient<WebSleeper>,
+}
 
 #[wasm_bindgen]
 impl EsploraClient {
     #[wasm_bindgen(constructor)]
     pub fn new(url: &str) -> JsResult<EsploraClient> {
         let client = Builder::new(url).build_async_with_sleeper::<WebSleeper>()?;
-        Ok(EsploraClient(client))
+        Ok(EsploraClient { client })
     }
 
     pub async fn full_scan(
@@ -35,13 +37,13 @@ impl EsploraClient {
         parallel_requests: usize,
     ) -> JsResult<Update> {
         let request: BdkFullScanRequest<KeychainKind> = request.into();
-        let result = self.0.full_scan(request, stop_gap, parallel_requests).await?;
+        let result = self.client.full_scan(request, stop_gap, parallel_requests).await?;
         Ok(result.into())
     }
 
     pub async fn sync(&mut self, request: SyncRequest, parallel_requests: usize) -> JsResult<Update> {
         let request: BdkSyncRequest<(KeychainKind, u32)> = request.into();
-        let result = self.0.sync(request, parallel_requests).await?;
+        let result = self.client.sync(request, parallel_requests).await?;
         Ok(result.into())
     }
 }
