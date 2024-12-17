@@ -16,7 +16,6 @@ jobs:
           - all
           - debug,default
           - debug,esplora
-          - debug,snap
     steps:
       - name: checkout
         uses: actions/checkout@v4
