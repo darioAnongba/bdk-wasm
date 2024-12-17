@@ -8,7 +8,7 @@
   </p>
 
   <p>
-    <a href=""><img alt="NPM Package" src="https://img.shields.io/crates/v/bdk_wallet.svg"/></a>
+    <a href="https://www.npmjs.com/package/@metamask/bdk"><img alt="NPM Version" src="https://img.shields.io/npm/v/@metamask/bdk?color=red&logo=npm"/></a>
     <a href="https://github.com/MetaMask/bdk-wasm/blob/master/LICENSE"><img alt="MIT or Apache-2.0 Licensed" src="https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg"/></a>
     <a href="https://coveralls.io/github/MetaMask/bdk-wasm?branch=main"><img src="https://coveralls.io/repos/github/MetaMask/bdk-wasm/badge.svg?branch=main"/></a>
     <a href="https://blog.rust-lang.org/2022/08/11/Rust-1.63.0.html"><img alt="Rustc Version 1.63.0+" src="https://img.shields.io/badge/rustc-1.63.0%2B-lightgrey.svg"/></a>
@@ -42,7 +42,7 @@ For a lightweight library providing stateless utility functions, see [`bitcoinjs
 ## Browser Usage
 
 ```sh
-yarn add bdk
+yarn add @metamask/bdk
 ```
 
 ## Development Environment
