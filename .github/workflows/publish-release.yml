@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wasm-pkg
-          path: bdk-wasm/pkg
+          path: pkg
           retention-days: 1
 
   publish-npm-dry-run:
@@ -44,6 +44,10 @@ jobs:
         with:
           name: wasm-pkg
           path: pkg
+      - name: Verify downloaded content
+        run: |
+          echo "Contents of pkg directory:"
+          ls -l pkg
       - name: Dry Run Publish
         run: wasm-pack publish --access=public -- --dry-run
 
