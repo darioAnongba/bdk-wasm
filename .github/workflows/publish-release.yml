@@ -37,32 +37,16 @@ jobs:
     needs: build-release
     runs-on: ubuntu-latest
     steps:
-      - name: Install wasm-pack
-        run: curl https://raw.githubusercontent.com/rustwasm/wasm-pack/a3a48401795cd4b3afe1d74568c93675a04f3970/installer/init.sh -sSf | sh -s -- -f
       - name: Download WASM build
         uses: actions/download-artifact@v4
         with:
           name: wasm-pkg
           path: pkg
-      - name: Verify downloaded content
-        run: |
-          echo "Contents of pkg directory:"
-          ls -l pkg
+      - name: Setup Node
+        uses: actions/setup-node@v4
       - name: Dry Run Publish
-        run: wasm-pack publish --access=public -- --dry-run
-
-  publish-npm:
-    needs: publish-npm-dry-run
-    runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-    steps:
-      - name: Install wasm-pack
-        run: curl https://raw.githubusercontent.com/rustwasm/wasm-pack/a3a48401795cd4b3afe1d74568c93675a04f3970/installer/init.sh -sSf | sh -s -- -f
-      - name: Download WASM build
-        uses: actions/download-artifact@v4
-        with:
-          name: wasm-pkg
-          path: pkg
+        working-directory: pkg
+        run: npm publish --access=public --dry-run
       - name: Publish
-        run: wasm-pack publish --access=public
+        working-directory: pkg
+        run: npm publish --access=public
