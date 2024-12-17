@@ -28,7 +28,7 @@ crate-type = ["cdylib", "rlib"]
 default = []
 esplora = ["bdk_esplora", "wasm-bindgen-futures"]
 debug = ["console_error_panic_hook"]
-snap = ["rmp-serde", "thiserror"]
+snap = ["rmp-serde", "thiserror", "wasm-bindgen-futures"]
 
 [dependencies]
 wasm-bindgen = "0.2.99"
