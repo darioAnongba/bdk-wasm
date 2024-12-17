@@ -36,6 +36,8 @@ jobs:
   publish-npm-dry-run:
     needs: build-release
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Download WASM build
         uses: actions/download-artifact@v4
