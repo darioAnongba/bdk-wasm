@@ -4,12 +4,12 @@
 
 extern crate wasm_bindgen_test;
 
-use bdk::{
+use bdk_wallet::bip39::Mnemonic;
+use bitcoindevkit::{
     seed_to_descriptor, seed_to_xpriv, set_panic_hook,
     types::{AddressType, Network},
     xpriv_to_descriptor, xpub_to_descriptor,
 };
-use bdk_wallet::bip39::Mnemonic;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test_configure!(run_in_browser);
