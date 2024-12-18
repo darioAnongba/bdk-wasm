@@ -1,8 +1,6 @@
 <div align="center">
   <h1>The Bitcoin Dev Kit: WebAssembly</h1>
 
-  <img src="./static/bdk.png" width="220" />
-
   <p>
     <strong>The Bitcoin Dev Kit for Browser and Node</strong>
   </p>
